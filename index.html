@@ -20,7 +20,7 @@
             background: #f1f5f9;
             color: var(--text-main);
             min-height: 100vh;
-            padding-top: 210px; /* Space for fixed header */
+            padding-top: 210px;
         }
 
         /* Fixed Top Container */
@@ -50,7 +50,6 @@
             margin: 5px 0;
         }
 
-        /* Control Bar */
         .control-bar {
             display: flex;
             justify-content: space-between;
@@ -77,7 +76,7 @@
             outline: none;
         }
 
-        /* Table CSS - Text Centered */
+        /* Table & Text Center */
         .main-card {
             background: white;
             border-radius: 15px;
@@ -89,14 +88,13 @@
         .table thead th {
             background: #1e293b !important;
             color: white !important;
-            text-align: center; /* Header Centered */
+            text-align: center;
             padding: 15px;
             font-size: 0.9rem;
-            border: none;
         }
 
         .table tbody td {
-            text-align: center; /* Data Centered */
+            text-align: center;
             vertical-align: middle;
             padding: 15px;
             font-weight: 500;
@@ -129,7 +127,7 @@
 
 <div id="loadingOverlay">
     <div class="spinner-border text-primary"></div>
-    <h6 class="mt-3 fw-bold">ক্লাউড থেকে তথ্য আপডেট হচ্ছে...</h6>
+    <h6 class="mt-3 fw-bold" id="loaderText">তথ্য লোড হচ্ছে...</h6>
 </div>
 
 <div class="fixed-top-container no-print">
@@ -139,7 +137,7 @@
             <div class="d-flex gap-2">
                 <button class="btn btn-sm btn-outline-light" onclick="clearForm()" data-bs-toggle="modal" data-bs-target="#entryModal">নতুন এন্ট্রি</button>
                 <button class="btn btn-sm btn-warning fw-bold" onclick="fetchFromCloud()">রিফ্রেশ সিঙ্ক</button>
-                <button class="btn btn-sm btn-light" onclick="exportTableToExcel()"><i class="bi bi-file-earmark-excel"></i></button>
+                <button class="btn btn-sm btn-light" onclick="exportTableToExcel()"><i class="bi bi-file-earmark-excel me-1"></i> রিপোর্ট ডাউনলোড</button>
             </div>
         </div>
     </nav>
@@ -160,7 +158,7 @@
 
 <div class="container-fluid">
     <div class="main-card">
-        <table class="table table-hover">
+        <table class="table table-hover" id="pensionTable">
             <thead>
                 <tr>
                     <th style="width: 25%;">পেনশনারের নাম</th>
@@ -216,13 +214,15 @@
     let currentPage = 1;
     const recordsPerPage = 12;
 
-    // 🟢 সাইট লোড হলেই অটোমেটিক ক্লাউড থেকে ডাটা নিয়ে আসবে
+    // ১. অটো লোড ফাংশন
     window.onload = function() {
         fetchFromCloud();
     };
 
+    // ২. সিঙ্ক ফাংশন (Cloud থেকে ডাটা আনা)
     async function fetchFromCloud() {
         document.getElementById('loadingOverlay').style.display = 'flex';
+        document.getElementById('loaderText').innerText = "ক্লাউড থেকে তথ্য আপডেট হচ্ছে...";
         try {
             const response = await fetch(scriptURL);
             const data = await response.json();
@@ -230,11 +230,17 @@
                 pensioners = data;
                 localStorage.setItem('pensionData', JSON.stringify(pensioners));
                 updateUI();
+                console.log("Sync Successful");
             }
-        } catch (e) { console.error("Sync error:", e); }
-        finally { document.getElementById('loadingOverlay').style.display = 'none'; }
+        } catch (e) { 
+            console.error("Sync Error:", e);
+            alert("সিঙ্ক করতে সমস্যা হয়েছে। ইন্টারনেট চেক করুন।");
+        } finally { 
+            document.getElementById('loadingOverlay').style.display = 'none'; 
+        }
     }
 
+    // ৩. UI এবং টেবিল আপডেট
     function updateUI() {
         const query = document.getElementById('searchBox').value.toLowerCase();
         const filtered = pensioners.slice().reverse().filter(p => 
@@ -270,15 +276,17 @@
         renderPagination(Math.ceil(filtered.length / recordsPerPage));
     }
 
+    // ৪. পেজিনেশন
     function renderPagination(total) {
         const wrapper = document.getElementById('pagination');
         wrapper.innerHTML = "";
         if(total <= 1) return;
         for(let i=1; i<=total; i++) {
-            wrapper.innerHTML += `<li class="page-item ${i===currentPage?'active':''}"><a class="page-link" onclick="currentPage=${i};updateUI()">${i}</a></li>`;
+            wrapper.innerHTML += `<li class="page-item ${i===currentPage?'active':''}"><a class="page-link" style="cursor:pointer" onclick="currentPage=${i};updateUI()">${i}</a></li>`;
         }
     }
 
+    // ৫. ডাটা সেভ এবং ক্লাউড এ পাঠানো
     document.getElementById('pensionForm').addEventListener('submit', async function(e) {
         e.preventDefault();
         const index = document.getElementById('editIndex').value;
@@ -291,16 +299,34 @@
         };
 
         document.getElementById('loadingOverlay').style.display = 'flex';
+        document.getElementById('loaderText').innerText = "ক্লাউডে সেভ হচ্ছে...";
         try {
             await fetch(scriptURL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(data) });
             if(index === "") pensioners.push(data);
             else pensioners[index] = data;
+            
             localStorage.setItem('pensionData', JSON.stringify(pensioners));
             updateUI();
             bootstrap.Modal.getInstance(document.getElementById('entryModal')).hide();
+            alert("সফলভাবে সেভ হয়েছে!");
+        } catch(err) {
+            alert("সেভ করতে সমস্যা হয়েছে!");
         } finally { document.getElementById('loadingOverlay').style.display = 'none'; }
     });
 
+    // ৬. রিপোর্ট বাটন (Excel Export)
+    function exportTableToExcel() {
+        if(pensioners.length === 0) {
+            alert("রপ্তানি করার মতো কোনো ডাটা নেই!");
+            return;
+        }
+        const ws = XLSX.utils.json_to_sheet(pensioners);
+        const wb = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(wb, ws, "PensionData");
+        XLSX.writeFile(wb, "Bajitpur_PPO_Report.xlsx");
+    }
+
+    // ৭. এডিট ও ডিলিট
     function editEntry(i) {
         const p = pensioners[i];
         document.getElementById('editIndex').value = i;
@@ -312,14 +338,19 @@
         new bootstrap.Modal(document.getElementById('entryModal')).show();
     }
 
-    function deleteEntry(i) { if(confirm("মুছে ফেলবেন?")) { pensioners.splice(i, 1); localStorage.setItem('pensionData', JSON.stringify(pensioners)); updateUI(); } }
-    function clearForm() { document.getElementById('editIndex').value = ""; document.getElementById('pensionForm').reset(); }
-    function exportTableToExcel() { 
-        const ws = XLSX.utils.json_to_sheet(pensioners); 
-        const wb = XLSX.utils.book_new(); 
-        XLSX.utils.book_append_sheet(wb, ws, "Database"); 
-        XLSX.writeFile(wb, "Bajitpur_PPO_Data.xlsx"); 
+    function deleteEntry(i) { 
+        if(confirm("আপনি কি নিশ্চিতভাবে এই তথ্যটি ডিলিট করতে চান? (এটি শুধু আপনার ব্রাউজার থেকে মুছবে)")) { 
+            pensioners.splice(i, 1); 
+            localStorage.setItem('pensionData', JSON.stringify(pensioners)); 
+            updateUI(); 
+        } 
     }
+
+    function clearForm() { 
+        document.getElementById('editIndex').value = ""; 
+        document.getElementById('pensionForm').reset(); 
+    }
+
 </script>
 </body>
 </html>
