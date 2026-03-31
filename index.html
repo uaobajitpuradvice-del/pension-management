@@ -333,7 +333,104 @@
         XLSX.writeFile(wb, "Bajitpur_PPO_Records.xlsx"); 
     }
 
-    updateUI();
+    updateUI();<script>
+    const scriptURL = 'https://script.google.com/macros/s/AKfycbzUr381MXJU3mq9tSmj2aKIIFK4ufZi0POFkiOfguFxtLa6f24tO1Q_gXbNSl2yM8dQ/exec';
+    
+    let pensioners = JSON.parse(localStorage.getItem('pensionData')) || [];
+    let currentPage = 1;
+    const recordsPerPage = 12;
+
+    // 🟢 সাইট ওপেন হলেই অটোমেটিক ক্লাউড থেকে ডাটা আনবে
+    window.onload = function() {
+        fetchFromCloud(); 
+    };
+
+    async function fetchFromCloud() {
+        document.getElementById('loadingOverlay').style.display = 'flex';
+        try {
+            const response = await fetch(scriptURL);
+            const data = await response.json();
+            if (Array.isArray(data)) {
+                pensioners = data; // ক্লাউড ডাটা দিয়ে লোকাল ডাটা আপডেট
+                localStorage.setItem('pensionData', JSON.stringify(pensioners));
+                updateUI();
+                console.log("Cloud Data Synced Automatically");
+            }
+        } catch (e) { 
+            console.error("Auto-sync failed, using local data."); 
+        } finally { 
+            document.getElementById('loadingOverlay').style.display = 'none'; 
+        }
+    }
+
+    // টেবিল আপডেট এবং অন্যান্য ফাংশন আগের মতোই থাকবে...
+    function updateUI() {
+        const query = document.getElementById('searchBox').value.toLowerCase();
+        const filtered = pensioners.slice().reverse().filter(p => 
+            p.name.toLowerCase().includes(query) || p.ppo.toString().includes(query)
+        );
+
+        document.getElementById('statTotal').innerText = pensioners.length;
+        document.getElementById('statStocked').innerText = pensioners.filter(p => p.status === 'Stocked').length;
+        document.getElementById('statDelivered').innerText = pensioners.filter(p => p.status === 'Delivered').length;
+
+        const start = (currentPage - 1) * recordsPerPage;
+        const displayData = filtered.slice(start, start + recordsPerPage);
+        
+        const tbody = document.getElementById('tableBody');
+        tbody.innerHTML = displayData.length === 0 ? `<tr><td colspan="6" class="py-5 text-muted">No Data Found</td></tr>` : 
+            displayData.map(item => {
+                const originalIdx = pensioners.findIndex(p => p.ppo === item.ppo);
+                return `<tr>
+                    <td>${item.name}</td>
+                    <td class="text-primary fw-bold">${item.ppo}</td>
+                    <td>${item.si}</td>
+                    <td><span class="badge-custom ${item.status === 'Stocked' ? 'status-stocked' : 'status-delivered'}">${item.status}</span></td>
+                    <td class="small text-muted">${item.remarks || '-'}</td>
+                    <td class="no-print">
+                        <button class="btn-action btn-edit" onclick="editEntry(${originalIdx})"><i class="bi bi-pencil"></i></button>
+                        <button class="btn-action btn-delete" onclick="deleteEntry(${originalIdx})"><i class="bi bi-trash"></i></button>
+                    </td>
+                </tr>`;
+            }).join('');
+        
+        renderPagination(Math.ceil(filtered.length / recordsPerPage));
+    }
+
+    // ডাটা সেভ করার সময় অটো ক্লাউড সিঙ্ক
+    document.getElementById('pensionForm').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        const index = document.getElementById('editIndex').value;
+        const data = {
+            name: document.getElementById('pName').value,
+            ppo: document.getElementById('pNo').value,
+            si: document.getElementById('pSi').value,
+            status: document.getElementById('pStatus').value,
+            remarks: document.getElementById('pRemarks').value
+        };
+
+        document.getElementById('loadingOverlay').style.display = 'flex';
+        try {
+            // ১. গুগল শিটে পাঠানো (মেইন ডাটাবেস)
+            await fetch(scriptURL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(data) });
+            
+            // ২. লোকাল মেমোরিতে আপডেট (তাত্ক্ষণিক দেখানোর জন্য)
+            if(index === "") pensioners.push(data);
+            else pensioners[index] = data;
+            
+            localStorage.setItem('pensionData', JSON.stringify(pensioners));
+            updateUI();
+            bootstrap.Modal.getInstance(document.getElementById('entryModal')).hide();
+            alert("Data Saved to Cloud!");
+        } catch(err) {
+            alert("Sync Error! Please check internet.");
+        } finally { 
+            document.getElementById('loadingOverlay').style.display = 'none'; 
+        }
+    });
+
+    // বাকি ফাংশনগুলো (editEntry, deleteEntry, exportTableToExcel) আগের কোড থেকে কপি করে দিন।
+</script>
 </script>
 </body>
 </html>
