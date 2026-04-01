@@ -69,8 +69,8 @@
         <div class="container-fluid">
             <span class="navbar-brand fw-bold">PPO Book MANAGEMENT </span>
             <div class="d-flex gap-2">
-                <button class="btn btn-sm btn-light fw-bold" onclick="clearForm()" data-bs-toggle="modal" data-bs-target="#entryModal"><i class="bi bi-plus-lg"></i> + নতুন এন্ট্রি</button>
-                <button class="btn btn-sm btn-outline-warning" onclick="fetchFromCloud()">রিফ্রেশ</button>
+                <button class="btn btn-sm btn-light fw-bold" onclick="clearForm()" data-bs-toggle="modal" data-bs-target="#entryModal"><i class="bi bi-plus-lg"></i> নতুন এন্ট্রি</button>
+                <button class="btn btn-sm btn-outline-warning" onclick="fetchFromCloud()"> 🔄 রিফ্রেশ ডাটা</button>
                 <button class="btn btn-sm btn-danger fw-bold" onclick="generateReport()"><i class="bi bi-printer"></i> প্রিন্ট/PDF</button>
             </div>
         </div>
@@ -79,7 +79,7 @@
     <div class="control-bar">
         <div class="d-flex gap-3">
             <div class="mini-stat">মোট: <span id="statTotal" class="text-primary">0</span></div>
-            <div class="mini-stat">জমা আছে: <span id="statStocked" class="text-success">0</span></div>
+            <div class="mini-stat">সংরক্ষিত: <span id="statStocked" class="text-success">0</span></div>
             <div class="mini-stat">বিতরণকৃত: <span id="statDelivered" class="text-danger">0</span></div>
         </div>
         <input type="text" id="searchBox" class="compact-search-box" placeholder="পেনশনারের নাম/নম্বর দিয়ে খুঁজুন..." oninput="currentPage=1; updateUI()">
