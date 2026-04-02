@@ -3,291 +3,390 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>পিপিও বহি ম্যানেজমেন্ট সফটওয়্যার</title>
-    
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Bengali:wght@400;600;700&display=swap" rel="stylesheet">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
-
+    <title>PPO ম্যানেজমেন্ট সিস্টেম</title>
     <style>
-        :root { --primary-dark: #0f172a; }
-        body { font-family: 'Noto Sans Bengali', sans-serif; background: #f8fafc; padding-top: 215px; }
-        
-        .fixed-top-container { position: fixed; top: 0; left: 0; right: 0; z-index: 1030; background: white; box-shadow: 0 2px 10px rgba(0,0,0,0.1); padding-bottom: 15px; }
-        .navbar { background: var(--primary-dark) !important; margin: 10px 20px; border-radius: 12px; padding: 10px 25px; }
-        .office-header { text-align: center; font-weight: 700; font-size: 1.8rem; color: #1e293b; margin: 8px 0; }
-        
-        .control-bar { display: flex; justify-content: space-between; align-items: center; padding: 0 30px; }
-        .mini-stat { background: white; padding: 8px 18px; border-radius: 8px; font-size: 0.95rem; font-weight: 700; border: 1px solid #e2e8f0; display: flex; align-items: center; gap: 10px; }
-        
-        /* LED Lights */
-        .led-light { width: 10px; height: 10px; border-radius: 50%; display: inline-block; }
-        .led-green { background-color: #22c55e; box-shadow: 0 0 8px #22c55e; animation: blink-green 2s infinite; }
-        .led-red { background-color: #ef4444; box-shadow: 0 0 8px #ef4444; animation: blink-red 2s infinite; }
-        
-        @keyframes blink-green { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
-        @keyframes blink-red { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
+        :root {
+            --primary-blue: #2563eb;
+            --dark-blue: #1e3a8a;
+            --bg-light: #f1f5f9;
+            --white: #ffffff;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --text-dark: #1e293b;
+            --highlight: #ffeb3b;
+        }
 
-        .compact-search-box { width: 300px; border: 2px solid #cbd5e1; border-radius: 8px; padding: 8px 15px; outline: none; }
-        .main-card { background: white; border-radius: 12px; border: 1px solid #e2e8f0; margin: 0 20px 50px 20px; overflow: hidden; }
-        .table thead th { background: #f1f5f9 !important; color: #475569 !important; text-align: center; padding: 15px; font-weight: 700; }
-        .table tbody td { text-align: center; vertical-align: middle; padding: 14px; border-bottom: 1px solid #f1f5f9; }
+        body {
+            font-family: 'Segoe UI', Tahoma, sans-serif;
+            margin: 0;
+            background-color: var(--bg-light);
+            color: var(--text-dark);
+            font-size: 18px;
+        }
+
+        /* Navigation with Dashboard */
+        nav {
+            background-color: var(--dark-blue);
+            padding: 10px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: white;
+            position: sticky; top: 0; z-index: 1000;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+        }
+
+        .nav-left { display: flex; align-items: center; gap: 25px; }
+        .nav-brand { font-size: 20px; font-weight: bold; border-right: 2px solid rgba(255,255,255,0.2); padding-right: 20px; }
+
+        .nav-dashboard { display: flex; gap: 15px; font-size: 15px; }
+        .nav-stat { background: rgba(255,255,255,0.1); padding: 5px 12px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.1); }
+        .nav-stat b { color: #60a5fa; font-size: 17px; }
+
+        .nav-links { display: flex; gap: 10px; }
+
+        .nav-btn {
+            background: rgba(255, 255, 255, 0.15);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            color: white;
+            padding: 8px 14px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: 0.3s;
+        }
+        .nav-btn:hover { background: var(--primary-blue); }
+
+        .office-header {
+            background: var(--white);
+            padding: 25px;
+            text-align: center;
+            border-bottom: 4px solid var(--primary-blue);
+        }
+        .office-name { font-size: 40px; font-weight: 800; color: var(--dark-blue); margin: 0; }
+        .report-sub { font-size: 24px; color: #475569; margin-top: 5px; display: none; }
+
+        .search-section {
+            background: #fff;
+            padding: 25px;
+            display: flex;
+            justify-content: center;
+            border-bottom: 1px solid #cbd5e1;
+        }
+        #searchInput {
+            width: 600px;
+            padding: 15px 25px;
+            border-radius: 50px;
+            border: 3px solid var(--primary-blue);
+            font-size: 18px;
+            outline: none;
+        }
+
+        .container { max-width: 1400px; margin: 20px auto; padding: 0 20px; }
         
-        .status-badge { padding: 6px 14px; border-radius: 20px; font-size: 0.8rem; font-weight: 700; display: flex; align-items: center; justify-content: center; gap: 8px; width: 120px; margin: 0 auto; }
-        .bg-stocked { background: #dcfce7; color: #15803d; border: 1px solid #bbf7d0; }
-        .bg-delivered { background: #fee2e2; color: #b91c1c; border: 1px solid #fecaca; }
+        .data-card { background: white; border-radius: 12px; padding: 25px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); position: relative; }
+        
+        .sort-btn-small {
+            position: absolute;
+            right: 25px;
+            top: 25px;
+            background: #f1f5f9;
+            border: 1px solid #cbd5e1;
+            padding: 5px 10px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 16px;
+            color: var(--primary-blue);
+        }
+
+        table { width: 100%; border-collapse: collapse; border: 2px solid #cbd5e1; }
+        th, td { padding: 12px; border: 1px solid #cbd5e1; font-size: 17px; text-align: center; }
+        th { background: #f8fafc; color: #475569; font-weight: bold; }
+        
+        .name-col { text-align: left !important; padding-left: 15px; }
+        .hl { background-color: var(--highlight); font-weight: bold; padding: 2px; }
+        .badge { padding: 5px 10px; border-radius: 6px; font-weight: bold; font-size: 14px; display: inline-block; }
+        .badge-saved { background: #dcfce7; color: var(--success); }
+        .badge-dist { background: #fef3c7; color: var(--warning); }
+
+        .action-container { position: relative; }
+        .dots-btn { background: #f1f5f9; border: 1px solid #cbd5e1; padding: 5px 10px; border-radius: 6px; cursor: pointer; }
+        .menu-dropdown {
+            display: none; position: absolute; right: 0; background: white;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2); border-radius: 8px; z-index: 5000; min-width: 130px;
+        }
+        .menu-dropdown button { width: 100%; padding: 10px; border: none; background: none; text-align: left; cursor: pointer; }
+        .show { display: block !important; }
+
+        .pagination { margin-top: 25px; display: flex; justify-content: center; align-items: center; gap: 15px; }
+        .page-btn { padding: 10px 20px; background: var(--primary-blue); color: white; border: none; border-radius: 30px; cursor: pointer; font-weight: bold; }
+        .page-btn:disabled { background: #cbd5e1; }
+
+        .form-card { background: white; padding: 30px; border-radius: 15px; max-width: 500px; margin: 20px auto; display: none; box-shadow: 0 15px 35px rgba(0,0,0,0.2); }
+        .form-group { margin-bottom: 12px; }
+        .form-group label { display: block; margin-bottom: 5px; font-weight: 600; }
+        .form-group input, .form-group select { width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px; }
+        .btn-save { width: 100%; padding: 12px; background: var(--primary-blue); color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; }
+
+        #loadingOverlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255,255,255,0.8); display: none; justify-content: center; align-items: center; z-index: 9999; font-size: 20px; font-weight: bold; }
 
         @media print {
-            body { padding-top: 0; background: white; }
-            .fixed-top-container, .no-print, .pagination, .btn { display: none !important; }
-            table { width: 100% !important; border: 1px solid black !important; }
-            th, td { border: 1px solid black !important; padding: 8px !important; }
-            .print-only { display: block !important; text-align: center; margin-bottom: 20px; }
+            nav, .search-section, .pagination, .dots-btn, .action-container, .nav-btn, .action-col, .date-col, .sort-btn-small {
+                display: none !important;
+            }
+            .office-header { display: block !important; border: none; margin-bottom: 20px; }
+            .report-sub { display: block !important; margin-bottom: 10px; }
+            table { width: 100%; border: 1px solid black; }
+            th, td { border: 1px solid black !important; color: black !important; padding: 8px; }
+            thead { display: table-header-group; }
+            tr { page-break-inside: avoid; }
         }
-        .print-only { display: none; }
     </style>
 </head>
 <body>
 
-<div id="loadingOverlay" style="display:none; position:fixed; inset:0; z-index:9999; background:rgba(255,255,255,0.8); flex-direction:column; justify-content:center; align-items:center;">
-    <div class="spinner-border text-dark"></div>
-    <h6 class="mt-3 fw-bold">ডাটা লোড হচ্ছে...</h6>
-</div>
+<div id="loadingOverlay">⏳ প্রসেসিং হচ্ছে...</div>
 
-<div class="print-only">
-    <h2 style="margin:0;">উপজেলা হিসাবরক্ষণ অফিস, বাজিতপুর,কিশোরগঞ্জ।/h2>
-    <h4 style="margin:10px 0;">পেনশন বহির রিপোর্ট</h4>
-    <hr style="border: 1px solid black;">
-</div>
-
-<div class="fixed-top-container no-print">
-    <nav class="navbar navbar-expand-lg navbar-dark">
-        <div class="container-fluid">
-            <span class="navbar-brand fw-bold">পিপিও বহি ম্যানেজমেন্ট</span>
-            <div class="d-flex gap-2">
-                <button class="btn btn-sm btn-light fw-bold" onclick="clearForm()" data-bs-toggle="modal" data-bs-target="#entryModal"><i class="bi bi-plus-lg"></i> নতুন এন্ট্রি</button>
-                <button class="btn btn-sm btn-outline-warning" onclick="fetchFromCloud()"> 🔁লোড ডাটা</button>
-                <button class="btn btn-sm btn-danger fw-bold" onclick="generateReport()"><i class="bi bi-printer"></i> প্রিন্ট/PDF</button>
-            </div>
-        </div>
-    </nav>
-    <div class="office-header">উপজেলা হিসাবরক্ষণ অফিস,বাজিতপুর, কিশোরগঞ্জ।</div>
-    <div class="control-bar">
-        <div class="d-flex gap-3">
-            <div class="mini-stat">মোট: <span id="statTotal" class="text-dark">0</span></div>
-            <div class="mini-stat">
-                <span class="led-light led-green"></span> সংরক্ষিত: <span id="statStocked" class="text-success">0</span>
-            </div>
-            <div class="mini-stat">
-                <span class="led-light led-red"></span> বিতরণকৃত: <span id="statDelivered" class="text-danger">0</span>
-            </div>
-        </div>
-        <input type="text" id="searchBox" class="compact-search-box" placeholder="পেনশনারের নাম/পিপিও নম্বর দিয়ে খুঁজুন..." oninput="currentPage=1; updateUI()">
-    </div>
-</div>
-
-<div class="container-fluid">
-    <div class="main-card">
-        <table class="table table-hover mb-0">
-            <thead>
-                <tr>
-                    <th>পেনশনারের নাম</th>
-                    <th>PPO নম্বর</th>
-                    <th>সিরিয়াল নং</th>
-                    <th>অবস্থা</th>
-                    <th>মন্তব্য</th>
-                    <th class="no-print">অ্যাকশন</th>
-                </tr>
-            </thead>
-            <tbody id="tableBody"></tbody>
-        </table>
-        <div class="p-3 bg-light border-top d-flex justify-content-between align-items-center no-print">
-            <div class="small text-muted fw-bold" id="pageInfo">পাতা ১ (মোট ১)</div>
-            <nav><ul class="pagination pagination-sm mb-0" id="pagination"></ul></nav>
+<nav>
+    <div class="nav-left">
+        <div class="nav-brand">📁 PPO ম্যানেজমেন্ট</div>
+        <div class="nav-dashboard">
+            <div class="nav-stat">মোট: <b id="total">০</b></div>
+            <div class="nav-stat">সংরক্ষিত: <b id="saved">০</b></div>
+            <div class="nav-stat">বিতরণকৃত: <b id="dist">০</b></div>
         </div>
     </div>
+    <div class="nav-links">
+        <button class="nav-btn" onclick="showSection('home')">🏠 হোম</button>
+        <button class="nav-btn" onclick="openForm()">➕ নতুন এন্ট্রি</button>
+        <button class="nav-btn" onclick="refreshPage()">🔄 রিফ্রেশ</button>
+        <button class="nav-btn" style="background: #ef4444;" onclick="printReport()">🖨️ রিপোর্ট প্রিন্ট</button>
+    </div>
+</nav>
+
+<div class="office-header" id="printHeader">
+    <h1 class="office-name">উপজেলা হিসাবরক্ষণ অফিস, বাজিতপুর</h1>
+    <div class="report-sub">পিপিও বহির তালিকা</div>
 </div>
 
-<div class="modal fade" id="entryModal" tabindex="-1">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content border-0 shadow-lg">
-            <div class="modal-header bg-dark text-white p-3">
-                <h6 class="modal-title fw-bold">পেনশনার ডাটা এন্ট্রি</h6>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
-            </div>
-            <div class="modal-body p-4">
-                <form id="pensionForm">
-                    <input type="hidden" id="editIndex">
-                    <div class="mb-3">
-                        <label class="form-label small fw-bold">পেনশনারের নাম</label>
-                        <input type="text" id="pName" class="form-control" required>
-                    </div>
-                    <div class="row mb-3">
-                        <div class="col">
-                            <label class="form-label small fw-bold">পিপিও নং</label>
-                            <input type="text" id="pNo" class="form-control" required>
-                        </div>
-                        <div class="col">
-                            <label class="form-label small fw-bold">সিরিয়াল নং</label>
-                            <input type="text" id="pSi" class="form-control" required>
-                        </div>
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label small fw-bold">বর্তমান অবস্থা</label>
-                        <select id="pStatus" class="form-select">
-                            <option value="Stocked">সংরক্ষিত</option>
-                            <option value="Delivered">বিতরণকৃত</option>
-                        </select>
-                    </div>
-                    <div class="mb-4"><label class="form-label small fw-bold">মন্তব্য</label><textarea id="pRemarks" class="form-control" rows="2"></textarea></div>
-                    <button type="submit" class="btn btn-dark w-100 fw-bold">সংরক্ষণ করুন</button>
-                </form>
+<div class="search-section">
+    <input type="text" id="searchInput" placeholder="🔍 নাম, পিপিও নং বা ক্রমিক নং দিয়ে খুঁজুন..." onkeyup="handleSearch()">
+</div>
+
+<div class="container">
+    <div id="homeSection">
+        <div class="data-card">
+            <h4 style="margin-bottom: 15px;">তথ্য তালিকা</h4>
+            <button class="sort-btn-small" onclick="toggleIdSort()" title="ক্রমিক অনুযায়ী সাজান">⇅</button>
+            
+            <table id="mainTable">
+                <thead>
+                    <tr>
+                        <th width="60">ক্রমিক</th>
+                        <th class="name-col">নাম</th>
+                        <th>পিপিও নম্বর</th>
+                        <th>অবস্থা</th>
+                        <th class="date-col">তারিখ</th>
+                        <th>মন্তব্য</th>
+                        <th class="action-col" width="80">অ্যাকশন</th>
+                    </tr>
+                </thead>
+                <tbody id="tableBody"></tbody>
+            </table>
+
+            <div class="pagination">
+                <button id="prevBtn" class="page-btn" onclick="changePage(-1)">⬅ পূর্ববর্তী</button>
+                <div style="font-weight:bold">পৃষ্ঠা: <span id="pageInfoBn">১</span></div>
+                <button id="nextBtn" class="page-btn" onclick="changePage(1)">পরবর্তী ➡</button>
             </div>
         </div>
     </div>
-</div>
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <div id="entrySection" class="form-card">
+        <h3 id="formTitle">তথ্য ইনপুট</h3>
+        <form id="ppoForm">
+            <input type="hidden" id="oldId">
+            <div class="form-group"><label>ক্রমিক নং</label><input type="number" id="pId" required></div>
+            <div class="form-group"><label>নাম</label><input type="text" id="pName" required></div>
+            <div class="form-group"><label>পিপিও নম্বর</label><input type="text" id="pNo" required></div>
+            <div class="form-group">
+                <label>অবস্থা</label>
+                <select id="pStatus">
+                    <option value="সংরক্ষিত">সংরক্ষিত</option>
+                    <option value="বিতরণকৃত">বিতরণকৃত</option>
+                </select>
+            </div>
+            <div class="form-group"><label>তারিখ</label><input type="date" id="pDate"></div>
+            <div class="form-group"><label>মন্তব্য</label><input type="text" id="pNote"></div>
+            <button type="submit" class="btn-save" id="submitBtn">সেভ করুন</button>
+        </form>
+    </div>
+</div>
 
 <script>
-    const scriptURL = 'https://script.google.com/macros/s/AKfycbzUr381MXJU3mq9tSmj2aKIIFK4ufZi0POFkiOfguFxtLa6f24tO1Q_gXbNSl2yM8dQ/exec';
-    let pensioners = JSON.parse(localStorage.getItem('pensionData')) || [];
-    let currentPage = 1;
-    const recordsPerPage = 15;
+    const scriptURL = 'https://script.google.com/macros/s/AKfycbx7YM0zW2FQHzvOfw8b7eW84dz65jrmkZBA5CpbQov4YKDIzLt7c1J_YK3eDx5hkZPz/exec';
+    let ppoData = [], filteredData = [], currentPage = 1, rowsPerPage = 10, currentSearchTerm = "";
+    let idSortOrder = 'asc';
 
-    window.onload = fetchFromCloud;
+    const enToBn = { '0':'০', '1':'১', '2':'২', '3':'৩', '4':'৪', '5':'৫', '6':'৬', '7':'৭', '8':'৮', '9':'৯' };
+    const bnToEn = { '০':'0', '১':'1', '২':'2', '৩':'3', '৪':'4', '৫':'5', '৬':'6', '৭':'7', '৮':'8', '৯':'9' };
 
-    async function fetchFromCloud() {
-        document.getElementById('loadingOverlay').style.display = 'flex';
-        try {
-            const res = await fetch(scriptURL);
-            const data = await res.json();
-            if (Array.isArray(data)) {
-                pensioners = data;
-                localStorage.setItem('pensionData', JSON.stringify(pensioners));
-                updateUI();
-            }
-        } catch (e) { console.error("Sync Error"); }
-        finally { document.getElementById('loadingOverlay').style.display = 'none'; }
+    function toBengaliNumber(str) { return str ? str.toString().replace(/\d/g, d => enToBn[d]) : ''; }
+    function toEnglishNumber(str) { return str ? str.toString().replace(/[০-৯]/g, d => bnToEn[d]) : ''; }
+
+    function highlight(text, term) {
+        if (!term) return text;
+        const q = toEnglishNumber(term).toLowerCase();
+        const regex = new RegExp(`(${q}|${toBengaliNumber(q)})`, 'gi');
+        return text.toString().replace(regex, '<span class="hl">$1</span>');
     }
 
-    function updateUI() {
-        const query = document.getElementById('searchBox').value.toLowerCase();
-        
-        // ফিল্টারিং ডাটা
-        const filtered = pensioners.slice().reverse().filter(p => 
-            p.name.toLowerCase().includes(query) || p.ppo.toString().includes(query)
-        );
+    window.onload = fetchData;
 
-        // উপরের হিসাব (Stats) ঠিক করা - একদম নিখুঁত ম্যাপিং
-        const stockedCount = filtered.filter(p => p.status === 'Stocked' || p.status === 'সংরক্ষিত').length;
-        const deliveredCount = filtered.filter(p => p.status === 'Delivered' || p.status === 'বিতরণকৃত').length;
+    function fetchData() {
+        showLoading(true);
+        fetch(scriptURL).then(res => res.json()).then(data => {
+            ppoData = data;
+            applyIdSort();
+            showLoading(false);
+        });
+    }
 
-        document.getElementById('statTotal').innerText = filtered.length;
-        document.getElementById('statStocked').innerText = stockedCount;
-        document.getElementById('statDelivered').innerText = deliveredCount;
+    function applyIdSort() {
+        ppoData.sort((a, b) => {
+            return idSortOrder === 'asc' ? parseInt(a.id) - parseInt(b.id) : parseInt(b.id) - parseInt(a.id);
+        });
+        handleSearch();
+    }
 
-        const totalPages = Math.ceil(filtered.length / recordsPerPage) || 1;
-        const start = (currentPage - 1) * recordsPerPage;
-        const displayData = filtered.slice(start, start + recordsPerPage);
-        
+    function toggleIdSort() {
+        idSortOrder = idSortOrder === 'asc' ? 'desc' : 'asc';
+        applyIdSort();
+    }
+
+    function renderTable(dataToRender = null) {
         const tbody = document.getElementById('tableBody');
-        tbody.innerHTML = displayData.map(item => {
-            const idx = pensioners.findIndex(p => p.ppo === item.ppo);
-            
-            // ডাটাবেস থেকে আসা মান যাচাই (Stocked অথবা সংরক্ষিত)
-            const isStocked = (item.status === 'Stocked' || item.status === 'সংরক্ষিত');
-            
-            return `<tr>
-                <td class="fw-semibold">${item.name}</td>
-                <td class="text-primary fw-bold">${item.ppo}</td>
-                <td>${item.si}</td>
-                <td>
-                    <div class="status-badge ${isStocked ? 'bg-stocked' : 'bg-delivered'}">
-                        <span class="led-light ${isStocked ? 'led-green' : 'led-red'}"></span>
-                        ${isStocked ? 'সংরক্ষিত' : 'বিতরণকৃত'}
+        tbody.innerHTML = '';
+        const data = dataToRender || filteredData.slice((currentPage - 1) * rowsPerPage, currentPage * rowsPerPage);
+
+        data.forEach(item => {
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td><b>${toBengaliNumber(item.id)}</b></td>
+                <td class="name-col">${highlight(item.name, currentSearchTerm)}</td>
+                <td>${highlight(toBengaliNumber(item.ppoNo), currentSearchTerm)}</td>
+                <td><span class="badge ${item.status === 'সংরক্ষিত' ? 'badge-saved' : 'badge-dist'}">${item.status}</span></td>
+                <td class="date-col">${item.deliveryDate ? toBengaliNumber(item.deliveryDate.split('T')[0]) : '---'}</td>
+                <td>${item.note || '-'}</td>
+                <td class="action-col">
+                    <div class="action-container">
+                        <button class="dots-btn" onclick="toggleMenu(event, '${item.id}')">⋮</button>
+                        <div id="menu-${item.id}" class="menu-dropdown">
+                            <button onclick="editRow('${item.id}')">✏️ এডিট</button>
+                            <button onclick="deleteRow('${item.id}')" style="color:red">🗑️ ডিলিট</button>
+                        </div>
                     </div>
                 </td>
-                <td class="small text-muted">${item.remarks || '-'}</td>
-                <td class="no-print">
-                    <button class="btn btn-sm btn-outline-dark border-0" onclick="editEntry(${idx})"><i class="bi bi-pencil-square"></i></button>
-                    <button class="btn btn-sm btn-outline-danger border-0" onclick="deleteEntry(${idx})"><i class="bi bi-trash3"></i></button>
-                </td>
-            </tr>`;
-        }).join('');
-
-        document.getElementById('pageInfo').innerText = `পাতা ${currentPage} (মোট ${totalPages})`;
-        renderPagination(totalPages);
+            `;
+            tbody.appendChild(row);
+        });
+        if(!dataToRender) updatePaginationUI();
+        updateCounts();
     }
 
-    function renderPagination(total) {
-        const wrapper = document.getElementById('pagination');
-        wrapper.innerHTML = "";
-        if(total <= 1) return;
-        
-        const link = (p, txt, active=false, dis=false) => `<li class="page-item ${active?'active':''} ${dis?'disabled':''}"><a class="page-link" onclick="changePage(${p})">${txt}</a></li>`;
-        
-        wrapper.innerHTML += link(currentPage - 1, '<i class="bi bi-chevron-left"></i>', false, currentPage === 1);
-        for (let i = 1; i <= total; i++) {
-            if (i === 1 || i === total || (i >= currentPage - 1 && i <= currentPage + 1)) {
-                wrapper.innerHTML += link(i, i, i === currentPage);
-            } else if (i === currentPage - 2 || i === currentPage + 2) {
-                wrapper.innerHTML += `<li class="page-item disabled"><span class="page-link">...</span></li>`;
-            }
-        }
-        wrapper.innerHTML += link(currentPage + 1, '<i class="bi bi-chevron-right"></i>', false, currentPage === total);
-    }
-
-    function changePage(p) { currentPage = p; updateUI(); }
-
-    function generateReport() {
-        const tbody = document.getElementById('tableBody');
-        tbody.innerHTML = pensioners.slice().reverse().map(item => {
-            const isStocked = (item.status === 'Stocked' || item.status === 'সংরক্ষিত');
-            return `<tr>
-                <td>${item.name}</td><td>${item.ppo}</td><td>${item.si}</td>
-                <td>${isStocked ? 'সংরক্ষিত' : 'বিতরণকৃত'}</td>
-                <td>${item.remarks || '-'}</td>
-            </tr>`;
-        }).join('');
+    function printReport() {
+        const oldFiltered = [...filteredData];
+        const oldPage = currentPage;
+        filteredData = [...ppoData]; 
+        renderTable(filteredData);
         window.print();
-        updateUI();
+        filteredData = oldFiltered;
+        currentPage = oldPage;
+        renderTable();
     }
 
-    document.getElementById('pensionForm').addEventListener('submit', async function(e) {
+    function toggleMenu(e, id) {
+        e.stopPropagation();
+        document.querySelectorAll('.menu-dropdown').forEach(m => { if(m.id !== `menu-${id}`) m.classList.remove('show'); });
+        document.getElementById(`menu-${id}`).classList.toggle('show');
+    }
+
+    window.onclick = () => document.querySelectorAll('.menu-dropdown').forEach(m => m.classList.remove('show'));
+
+    function handleSearch() {
+        currentSearchTerm = document.getElementById('searchInput').value;
+        const q = toEnglishNumber(currentSearchTerm).toLowerCase();
+        filteredData = ppoData.filter(i => 
+            i.name.toLowerCase().includes(q) || 
+            toEnglishNumber(i.ppoNo).toString().includes(q) || 
+            i.id.toString() === q
+        );
+        currentPage = 1;
+        renderTable();
+    }
+
+    function changePage(dir) { currentPage += dir; renderTable(); }
+
+    function updatePaginationUI() {
+        const totalPages = Math.ceil(filteredData.length / rowsPerPage);
+        document.getElementById('pageInfoBn').innerText = toBengaliNumber(currentPage);
+        document.getElementById('prevBtn').disabled = currentPage === 1;
+        document.getElementById('nextBtn').disabled = currentPage >= totalPages || totalPages === 0;
+    }
+
+    document.getElementById('ppoForm').onsubmit = function(e) {
         e.preventDefault();
-        const index = document.getElementById('editIndex').value;
-        const data = {
+        showLoading(true);
+        const oldId = document.getElementById('oldId').value;
+        const obj = {
+            action: oldId ? "edit" : "add", oldId: oldId,
+            id: document.getElementById('pId').value,
             name: document.getElementById('pName').value,
-            ppo: document.getElementById('pNo').value,
-            si: document.getElementById('pSi').value,
+            ppoNo: document.getElementById('pNo').value,
             status: document.getElementById('pStatus').value,
-            remarks: document.getElementById('pRemarks').value
+            deliveryDate: document.getElementById('pDate').value,
+            note: document.getElementById('pNote').value
         };
-        document.getElementById('loadingOverlay').style.display = 'flex';
-        try {
-            await fetch(scriptURL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(data) });
-            if(index === "") pensioners.push(data);
-            else pensioners[index] = data;
-            localStorage.setItem('pensionData', JSON.stringify(pensioners));
-            updateUI();
-            bootstrap.Modal.getInstance(document.getElementById('entryModal')).hide();
-        } finally { document.getElementById('loadingOverlay').style.display = 'none'; }
-    });
+        fetch(scriptURL, { method: 'POST', body: JSON.stringify(obj) }).then(() => {
+            alert("সফল হয়েছে!");
+            showSection('home');
+            fetchData();
+        });
+    };
 
-    function editEntry(i) {
-        const p = pensioners[i];
-        document.getElementById('editIndex').value = i;
-        document.getElementById('pName').value = p.name;
-        document.getElementById('pNo').value = p.ppo;
-        document.getElementById('pSi').value = p.si;
-        document.getElementById('pStatus').value = (p.status === 'সংরক্ষিত' ? 'Stocked' : 'Delivered');
-        document.getElementById('pRemarks').value = p.remarks;
-        new bootstrap.Modal(document.getElementById('entryModal')).show();
+    function editRow(id) {
+        const item = ppoData.find(x => x.id == id);
+        showSection('entry');
+        document.getElementById('formTitle').innerText = "তথ্য সংশোধন";
+        document.getElementById('oldId').value = item.id;
+        document.getElementById('pId').value = item.id;
+        document.getElementById('pName').value = item.name;
+        document.getElementById('pNo').value = item.ppoNo;
+        document.getElementById('pStatus').value = item.status;
+        document.getElementById('pDate').value = item.deliveryDate ? item.deliveryDate.split('T')[0] : '';
+        document.getElementById('pNote').value = item.note || '';
     }
 
-    function deleteEntry(i) { if(confirm("মুছে ফেলবেন?")) { pensioners.splice(i, 1); localStorage.setItem('pensionData', JSON.stringify(pensioners)); updateUI(); } }
-    function clearForm() { document.getElementById('editIndex').value = ""; document.getElementById('pensionForm').reset(); }
+    function deleteRow(id) {
+        if(confirm("মুছে ফেলবেন?")) {
+            showLoading(true);
+            fetch(scriptURL, { method: 'POST', body: JSON.stringify({action: "delete", id: id}) }).then(() => fetchData());
+        }
+    }
+
+    function showSection(s) {
+        document.getElementById('homeSection').style.display = s === 'home' ? 'block' : 'none';
+        document.getElementById('entrySection').style.display = s === 'entry' ? 'block' : 'none';
+    }
+    function openForm() { document.getElementById('ppoForm').reset(); document.getElementById('oldId').value = ""; showSection('entry'); }
+    function showLoading(s) { document.getElementById('loadingOverlay').style.display = s ? 'flex' : 'none'; }
+    function refreshPage() { fetchData(); }
+    function updateCounts() {
+        document.getElementById('total').innerText = toBengaliNumber(ppoData.length);
+        document.getElementById('saved').innerText = toBengaliNumber(ppoData.filter(x => x.status === 'সংরক্ষিত').length);
+        document.getElementById('dist').innerText = toBengaliNumber(ppoData.filter(x => x.status === 'বিতরণকৃত').length);
+    }
 </script>
+
 </body>
 </html>
