@@ -3,343 +3,314 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PPO ম্যানেজমেন্ট সিস্টেম</title>
+    <title>PPO ম্যানেজমেন্ট সিস্টেম - ক্লিন প্রো</title>
     <style>
         :root {
             --primary-blue: #2563eb;
             --dark-blue: #1e3a8a;
-            --bg-light: #f1f5f9;
+            --bg-solid: #f1f5f9;
             --white: #ffffff;
             --success: #10b981;
             --warning: #f59e0b;
-            --text-dark: #1e293b;
             --highlight: #ffeb3b;
+            --shadow-lg: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
         }
 
         body {
             font-family: 'Segoe UI', Tahoma, sans-serif;
             margin: 0;
-            background-color: var(--bg-light);
-            color: var(--text-dark);
-            font-size: 18px;
+            background-color: var(--bg-solid);
+            font-size: 17px;
         }
 
-        /* Navigation with Dashboard */
+        /* Navbar */
         nav {
             background-color: var(--dark-blue);
-            padding: 10px 30px;
+            padding: 12px 30px;
             display: flex;
             justify-content: space-between;
             align-items: center;
             color: white;
             position: sticky; top: 0; z-index: 1000;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
         }
 
-        .nav-left { display: flex; align-items: center; gap: 25px; }
-        .nav-brand { font-size: 20px; font-weight: bold; border-right: 2px solid rgba(255,255,255,0.2); padding-right: 20px; }
+        .nav-brand { font-size: 20px; font-weight: bold; }
+        .nav-stats-container { display: flex; align-items: center; gap: 15px; }
+        .nav-stat { background: rgba(255,255,255,0.1); padding: 5px 15px; border-radius: 20px; font-size: 14px; }
 
-        .nav-dashboard { display: flex; gap: 15px; font-size: 15px; }
-        .nav-stat { background: rgba(255,255,255,0.1); padding: 5px 12px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.1); }
-        .nav-stat b { color: #60a5fa; font-size: 17px; }
-
-        .nav-links { display: flex; gap: 10px; }
-
-        .nav-btn {
-            background: rgba(255, 255, 255, 0.15);
-            border: 1px solid rgba(255, 255, 255, 0.3);
+        /* Refresh Button */
+        .refresh-btn {
+            background: #10b981;
             color: white;
-            padding: 8px 14px;
+            border: none;
+            padding: 8px 15px;
             border-radius: 8px;
             cursor: pointer;
-            font-size: 14px;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            gap: 8px;
             transition: 0.3s;
         }
-        .nav-btn:hover { background: var(--primary-blue); }
+        .refresh-btn:hover { background: #059669; transform: scale(1.05); }
 
+        .spin { animation: rotate 1s linear infinite; }
+        @keyframes rotate { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+
+        /* Header & Search */
         .office-header {
             background: var(--white);
-            padding: 25px;
+            padding: 30px;
             text-align: center;
-            border-bottom: 4px solid var(--primary-blue);
+            margin: 20px auto;
+            max-width: 90%;
+            border-radius: 20px;
+            box-shadow: var(--shadow-lg);
         }
-        .office-name { font-size: 40px; font-weight: 800; color: var(--dark-blue); margin: 0; }
-        .report-sub { font-size: 24px; color: #475569; margin-top: 5px; display: none; }
+        .office-name { font-size: 35px; color: var(--dark-blue); margin: 0; font-weight: 800; }
 
-        .search-section {
-            background: #fff;
-            padding: 25px;
-            display: flex;
-            justify-content: center;
-            border-bottom: 1px solid #cbd5e1;
-        }
+        /* Large Animated Search Bar */
+        .search-section { margin: 30px auto; display: flex; justify-content: center; gap: 15px; }
         #searchInput {
-            width: 600px;
-            padding: 15px 25px;
-            border-radius: 50px;
-            border: 3px solid var(--primary-blue);
-            font-size: 18px;
-            outline: none;
+            width: 500px; padding: 18px 30px; font-size: 18px; border-radius: 50px;
+            border: 3px solid #cbd5e1; outline: none; transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
         }
+        #searchInput:focus { width: 600px; border-color: var(--primary-blue); box-shadow: 0 0 25px rgba(37, 99, 235, 0.2); }
 
-        .container { max-width: 1400px; margin: 20px auto; padding: 0 20px; }
-        
-        .data-card { background: white; border-radius: 12px; padding: 25px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); position: relative; }
-        
-        .sort-btn-small {
-            position: absolute;
-            right: 25px;
-            top: 25px;
-            background: #f1f5f9;
-            border: 1px solid #cbd5e1;
-            padding: 5px 10px;
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 16px;
-            color: var(--primary-blue);
-        }
+        #filterStatus { padding: 15px 25px; border-radius: 50px; border: 3px solid var(--primary-blue); font-weight: bold; cursor: pointer; }
 
+        /* Table Design */
+        .container { max-width: 1400px; margin: 0 auto; padding-bottom: 60px; }
+        .data-card { background: var(--white); border-radius: 20px; padding: 25px; box-shadow: var(--shadow-lg); }
         table { width: 100%; border-collapse: collapse; border: 2px solid #cbd5e1; }
-        th, td { padding: 12px; border: 1px solid #cbd5e1; font-size: 17px; text-align: center; }
-        th { background: #f8fafc; color: #475569; font-weight: bold; }
+        th, td { padding: 15px; border: 1px solid #cbd5e1; text-align: center; }
+        th { background: #f8fafc; color: var(--dark-blue); font-weight: 700; }
         
-        .name-col { text-align: left !important; padding-left: 15px; }
-        .hl { background-color: var(--highlight); font-weight: bold; padding: 2px; }
-        .badge { padding: 5px 10px; border-radius: 6px; font-weight: bold; font-size: 14px; display: inline-block; }
-        .badge-saved { background: #dcfce7; color: var(--success); }
-        .badge-dist { background: #fef3c7; color: var(--warning); }
+        tr { transition: 0.2s; }
+        tr:hover { background-color: #f1f7ff; }
 
-        .action-container { position: relative; }
-        .dots-btn { background: #f1f5f9; border: 1px solid #cbd5e1; padding: 5px 10px; border-radius: 6px; cursor: pointer; }
-        .menu-dropdown {
-            display: none; position: absolute; right: 0; background: white;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.2); border-radius: 8px; z-index: 5000; min-width: 130px;
-        }
-        .menu-dropdown button { width: 100%; padding: 10px; border: none; background: none; text-align: left; cursor: pointer; }
-        .show { display: block !important; }
-
-        .pagination { margin-top: 25px; display: flex; justify-content: center; align-items: center; gap: 15px; }
-        .page-btn { padding: 10px 20px; background: var(--primary-blue); color: white; border: none; border-radius: 30px; cursor: pointer; font-weight: bold; }
-        .page-btn:disabled { background: #cbd5e1; }
-
-        .form-card { background: white; padding: 30px; border-radius: 15px; max-width: 500px; margin: 20px auto; display: none; box-shadow: 0 15px 35px rgba(0,0,0,0.2); }
-        .form-group { margin-bottom: 12px; }
-        .form-group label { display: block; margin-bottom: 5px; font-weight: 600; }
-        .form-group input, .form-group select { width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px; }
-        .btn-save { width: 100%; padding: 12px; background: var(--primary-blue); color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; }
-
-        #loadingOverlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255,255,255,0.8); display: none; justify-content: center; align-items: center; z-index: 9999; font-size: 20px; font-weight: bold; }
+        .hl { background-color: var(--highlight); padding: 2px; border-radius: 3px; font-weight: bold; }
+        
+        /* Form & Pagination */
+        .page-btn { padding: 10px 20px; border-radius: 12px; border: 1px solid #cbd5e1; background: white; cursor: pointer; font-weight: 600; }
+        .page-btn:hover:not(:disabled) { background: var(--dark-blue); color: white; }
+        #goToPage { width: 60px; padding: 8px; text-align: center; border-radius: 8px; border: 2px solid var(--primary-blue); font-weight: bold; }
 
         @media print {
-            nav, .search-section, .pagination, .dots-btn, .action-container, .nav-btn, .action-col, .date-col, .sort-btn-small {
-                display: none !important;
-            }
-            .office-header { display: block !important; border: none; margin-bottom: 20px; }
-            .report-sub { display: block !important; margin-bottom: 10px; }
-            table { width: 100%; border: 1px solid black; }
-            th, td { border: 1px solid black !important; color: black !important; padding: 8px; }
-            thead { display: table-header-group; }
-            tr { page-break-inside: avoid; }
+            nav, .search-section, .pagination, .action-col { display: none !important; }
+            table { border: 2px solid black; }
+            th, td { border: 1px solid black !important; }
         }
     </style>
 </head>
 <body>
 
-<div id="loadingOverlay">⏳ প্রসেসিং হচ্ছে...</div>
+<div id="loadingOverlay" style="position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(255,255,255,0.8); display:none; justify-content:center; align-items:center; z-index:9999;"><b>🔄 ডাটা প্রসেসিং হচ্ছে...</b></div>
 
 <nav>
-    <div class="nav-left">
-        <div class="nav-brand">📁 PPO ম্যানেজমেন্ট</div>
-        <div class="nav-dashboard">
-            <div class="nav-stat">মোট: <b id="total">০</b></div>
-            <div class="nav-stat">সংরক্ষিত: <b id="saved">০</b></div>
-            <div class="nav-stat">বিতরণকৃত: <b id="dist">০</b></div>
-        </div>
+    <div class="nav-brand">📂 PPO ড্যাশবোর্ড</div>
+    <div class="nav-stats-container">
+        <button class="refresh-btn" id="refreshBtn" onclick="fetchData()">
+            <span id="refreshIcon">🔄</span> রিফ্রেশ করুন
+        </button>
+        <div class="nav-stat">মোট: <span id="total">০</span></div>
+        <div class="nav-stat">সংরক্ষিত: <span id="saved">০</span></div>
+        <div class="nav-stat">বিতরণকৃত: <span id="dist">০</span></div>
     </div>
-    <div class="nav-links">
-        <button class="nav-btn" onclick="showSection('home')">🏠 হোম</button>
-        <button class="nav-btn" onclick="openForm()">➕ নতুন এন্ট্রি</button>
-        <button class="nav-btn" onclick="refreshPage()">🔄 রিফ্রেশ</button>
-        <button class="nav-btn" style="background: #ef4444;" onclick="printReport()">🖨️ রিপোর্ট প্রিন্ট</button>
+    <div style="display:flex; gap:10px;">
+        <button class="page-btn" onclick="showSection('home')">🏠 হোম</button>
+        <button class="page-btn" style="background:var(--primary-blue); color:white;" onclick="openForm()">➕ নতুন এন্ট্রি</button>
     </div>
 </nav>
 
-<div class="office-header" id="printHeader">
+<div class="office-header">
     <h1 class="office-name">উপজেলা হিসাবরক্ষণ অফিস, বাজিতপুর</h1>
-    <div class="report-sub">পিপিও বহির তালিকা</div>
+    <p style="font-size: 20px; color: #64748b; margin-top: 10px;">অনলাইন পিপিও ম্যানেজমেন্ট সিস্টেম</p>
 </div>
 
 <div class="search-section">
-    <input type="text" id="searchInput" placeholder="🔍 নাম, পিপিও নং বা ক্রমিক নং দিয়ে খুঁজুন..." onkeyup="handleSearch()">
+    <input type="text" id="searchInput" placeholder="🔎 নাম বা পিপিও নম্বর লিখে খুঁজুন..." onkeyup="handleSearch()">
+    <select id="filterStatus" onchange="handleSearch()">
+        <option value="all">সব রেকর্ড</option>
+        <option value="সংরক্ষিত">📥 সংরক্ষিত</option>
+        <option value="বিতরণকৃত">📤 বিতরণকৃত</option>
+    </select>
+    <button class="page-btn" style="background: #ef4444; color: white;" onclick="printReport()">🖨️ প্রিন্ট করুন</button>
 </div>
 
 <div class="container">
     <div id="homeSection">
         <div class="data-card">
-            <h4 style="margin-bottom: 15px;">তথ্য তালিকা</h4>
-            <button class="sort-btn-small" onclick="toggleIdSort()" title="ক্রমিক অনুযায়ী সাজান">⇅</button>
-            
-            <table id="mainTable">
+            <table>
                 <thead>
                     <tr>
-                        <th width="60">ক্রমিক</th>
-                        <th class="name-col">নাম</th>
+                        <th width="80">ক্রমিক</th>
+                        <th style="text-align:left; padding-left:20px;">নাম</th>
                         <th>পিপিও নম্বর</th>
                         <th>অবস্থা</th>
-                        <th class="date-col">তারিখ</th>
-                        <th>মন্তব্য</th>
-                        <th class="action-col" width="80">অ্যাকশন</th>
+                        <th>তারিখ</th>
+                        <th class="action-col" width="100">অ্যাকশন</th>
                     </tr>
                 </thead>
-                <tbody id="tableBody"></tbody>
+                <tbody id="tableBody">
+                    </tbody>
             </table>
-
-            <div class="pagination">
-                <button id="prevBtn" class="page-btn" onclick="changePage(-1)">⬅ পূর্ববর্তী</button>
-                <div style="font-weight:bold">পৃষ্ঠা: <span id="pageInfoBn">১</span></div>
-                <button id="nextBtn" class="page-btn" onclick="changePage(1)">পরবর্তী ➡</button>
+            
+            <div style="margin-top: 30px; display: flex; justify-content: center; gap: 15px; align-items: center;">
+                <button id="prevBtn" class="page-btn" onclick="changePage(-1)">⇠ পূর্ববর্তী</button>
+                <span>পৃষ্ঠা: <input type="number" id="goToPage" min="1" onchange="jumpToPage(this.value)"> / <b id="totalPageBn">১</b></span>
+                <button id="nextBtn" class="page-btn" onclick="changePage(1)">পরবর্তী ⇢</button>
             </div>
         </div>
     </div>
 
-    <div id="entrySection" class="form-card">
-        <h3 id="formTitle">তথ্য ইনপুট</h3>
-        <form id="ppoForm">
-            <input type="hidden" id="oldId">
-            <div class="form-group"><label>ক্রমিক নং</label><input type="number" id="pId" required></div>
-            <div class="form-group"><label>নাম</label><input type="text" id="pName" required></div>
-            <div class="form-group"><label>পিপিও নম্বর</label><input type="text" id="pNo" required></div>
-            <div class="form-group">
-                <label>অবস্থা</label>
-                <select id="pStatus">
-                    <option value="সংরক্ষিত">সংরক্ষিত</option>
-                    <option value="বিতরণকৃত">বিতরণকৃত</option>
-                </select>
-            </div>
-            <div class="form-group"><label>তারিখ</label><input type="date" id="pDate"></div>
-            <div class="form-group"><label>মন্তব্য</label><input type="text" id="pNote"></div>
-            <button type="submit" class="btn-save" id="submitBtn">সেভ করুন</button>
-        </form>
+    <div id="entrySection" style="display:none; animation: fadeIn 0.5s;">
+        <div style="background:white; padding:40px; border-radius:20px; max-width:600px; margin:0 auto; box-shadow:var(--shadow-lg);">
+            <h2 id="formTitle" style="text-align:center; color:var(--dark-blue);">নতুন ডাটা এন্ট্রি</h2>
+            <form id="ppoForm">
+                <input type="hidden" id="oldId">
+                <div style="margin-bottom:15px;"><label>ক্রমিক নং</label><input type="number" id="pId" required style="width:100%; padding:10px; border-radius:8px; border:1px solid #ddd;"></div>
+                <div style="margin-bottom:15px;"><label>নাম</label><input type="text" id="pName" required style="width:100%; padding:10px; border-radius:8px; border:1px solid #ddd;"></div>
+                <div style="margin-bottom:15px;"><label>পিপিও নম্বর</label><input type="text" id="pNo" required style="width:100%; padding:10px; border-radius:8px; border:1px solid #ddd;"></div>
+                <div style="margin-bottom:15px;"><label>অবস্থা</label>
+                    <select id="pStatus" style="width:100%; padding:10px; border-radius:8px; border:1px solid #ddd;">
+                        <option value="সংরক্ষিত">সংরক্ষিত</option>
+                        <option value="বিতরণকৃত">বিতরণকৃত</option>
+                    </select>
+                </div>
+                <div style="margin-bottom:15px;"><label>তারিখ</label><input type="date" id="pDate" style="width:100%; padding:10px; border-radius:8px; border:1px solid #ddd;"></div>
+                <div style="margin-bottom:15px;"><label>মন্তব্য</label><input type="text" id="pNote" style="width:100%; padding:10px; border-radius:8px; border:1px solid #ddd;"></div>
+                <button type="submit" style="width:100%; padding:15px; background:var(--primary-blue); color:white; border:none; border-radius:10px; font-weight:bold; cursor:pointer;">সেভ করুন</button>
+                <button type="button" onclick="showSection('home')" style="width:100%; margin-top:10px; background:none; border:none; color:gray; cursor:pointer;">বাতিল</button>
+            </form>
+        </div>
     </div>
 </div>
 
 <script>
     const scriptURL = 'https://script.google.com/macros/s/AKfycbx7YM0zW2FQHzvOfw8b7eW84dz65jrmkZBA5CpbQov4YKDIzLt7c1J_YK3eDx5hkZPz/exec';
-    let ppoData = [], filteredData = [], currentPage = 1, rowsPerPage = 10, currentSearchTerm = "";
-    let idSortOrder = 'asc';
+    let ppoData = [], filteredData = [], currentPage = 1, totalPages = 1;
+    const rowsPerPage = 20;
 
     const enToBn = { '0':'০', '1':'১', '2':'২', '3':'৩', '4':'৪', '5':'৫', '6':'৬', '7':'৭', '8':'৮', '9':'৯' };
-    const bnToEn = { '০':'0', '১':'1', '২':'2', '৩':'3', '৪':'4', '৫':'5', '৬':'6', '৭':'7', '৮':'8', '৯':'9' };
-
-    function toBengaliNumber(str) { return str ? str.toString().replace(/\d/g, d => enToBn[d]) : ''; }
-    function toEnglishNumber(str) { return str ? str.toString().replace(/[০-৯]/g, d => bnToEn[d]) : ''; }
+    function toBn(n) { return n ? n.toString().replace(/\d/g, d => enToBn[d]) : '০'; }
 
     function highlight(text, term) {
         if (!term) return text;
-        const q = toEnglishNumber(term).toLowerCase();
-        const regex = new RegExp(`(${q}|${toBengaliNumber(q)})`, 'gi');
+        const regex = new RegExp(`(${term})`, 'gi');
         return text.toString().replace(regex, '<span class="hl">$1</span>');
     }
 
     window.onload = fetchData;
 
     function fetchData() {
+        const icon = document.getElementById('refreshIcon');
+        icon.classList.add('spin');
         showLoading(true);
+
         fetch(scriptURL).then(res => res.json()).then(data => {
-            ppoData = data;
-            applyIdSort();
+            // ডাটা আইডি অনুযায়ী সর্টিং
+            ppoData = data.sort((a, b) => parseInt(a.id) - parseInt(b.id));
+            handleSearch();
             showLoading(false);
+            icon.classList.remove('spin');
+        }).catch(() => {
+            showLoading(false);
+            icon.classList.remove('spin');
         });
     }
 
-    function applyIdSort() {
-        ppoData.sort((a, b) => {
-            return idSortOrder === 'asc' ? parseInt(a.id) - parseInt(b.id) : parseInt(b.id) - parseInt(a.id);
+    function handleSearch() {
+        const term = document.getElementById('searchInput').value.trim();
+        const statusFilter = document.getElementById('filterStatus').value;
+        
+        filteredData = ppoData.filter(item => {
+            const matchesSearch = item.name.toLowerCase().includes(term.toLowerCase()) || item.ppoNo.toString().includes(term);
+            const matchesFilter = statusFilter === 'all' || item.status === statusFilter;
+            return matchesSearch && matchesFilter;
         });
-        handleSearch();
-    }
-
-    function toggleIdSort() {
-        idSortOrder = idSortOrder === 'asc' ? 'desc' : 'asc';
-        applyIdSort();
+        
+        totalPages = Math.ceil(filteredData.length / rowsPerPage) || 1;
+        currentPage = 1;
+        renderTable();
     }
 
     function renderTable(dataToRender = null) {
         const tbody = document.getElementById('tableBody');
         tbody.innerHTML = '';
+        const term = document.getElementById('searchInput').value;
         const data = dataToRender || filteredData.slice((currentPage - 1) * rowsPerPage, currentPage * rowsPerPage);
 
-        data.forEach(item => {
-            const row = document.createElement('tr');
-            row.innerHTML = `
-                <td><b>${toBengaliNumber(item.id)}</b></td>
-                <td class="name-col">${highlight(item.name, currentSearchTerm)}</td>
-                <td>${highlight(toBengaliNumber(item.ppoNo), currentSearchTerm)}</td>
-                <td><span class="badge ${item.status === 'সংরক্ষিত' ? 'badge-saved' : 'badge-dist'}">${item.status}</span></td>
-                <td class="date-col">${item.deliveryDate ? toBengaliNumber(item.deliveryDate.split('T')[0]) : '---'}</td>
-                <td>${item.note || '-'}</td>
-                <td class="action-col">
-                    <div class="action-container">
-                        <button class="dots-btn" onclick="toggleMenu(event, '${item.id}')">⋮</button>
-                        <div id="menu-${item.id}" class="menu-dropdown">
-                            <button onclick="editRow('${item.id}')">✏️ এডিট</button>
-                            <button onclick="deleteRow('${item.id}')" style="color:red">🗑️ ডিলিট</button>
-                        </div>
-                    </div>
-                </td>
-            `;
-            tbody.appendChild(row);
-        });
-        if(!dataToRender) updatePaginationUI();
-        updateCounts();
+        if(data.length === 0) {
+            tbody.innerHTML = `<tr><td colspan="6">কোন তথ্য পাওয়া যায়নি।</td></tr>`;
+        } else {
+            data.forEach(item => {
+                const row = `<tr>
+                    <td><b>${toBn(item.id)}</b></td>
+                    <td style="text-align:left; padding-left:20px;">${highlight(item.name, term)}</td>
+                    <td>${highlight(toBn(item.ppoNo), toBn(term))}</td>
+                    <td><span style="padding:5px 12px; border-radius:15px; font-size:12px; font-weight:bold; background:${item.status === 'সংরক্ষিত' ? '#dcfce7' : '#fef3c7'}; color:${item.status === 'সংরক্ষিত' ? '#166534' : '#92400e'}">${item.status}</span></td>
+                    <td>${item.deliveryDate ? toBn(item.deliveryDate.split('T')[0]) : '---'}</td>
+                    <td class="action-col">
+                        <button class="page-btn" style="padding:5px 10px;" onclick="editRow('${item.id}')">✏️</button>
+                        <button class="page-btn" style="padding:5px 10px; color:red;" onclick="deleteRow('${item.id}')">🗑️</button>
+                    </td>
+                </tr>`;
+                tbody.innerHTML += row;
+            });
+        }
+        if(!dataToRender) updateUI();
     }
 
-    function printReport() {
-        const oldFiltered = [...filteredData];
-        const oldPage = currentPage;
-        filteredData = [...ppoData]; 
-        renderTable(filteredData);
-        window.print();
-        filteredData = oldFiltered;
-        currentPage = oldPage;
-        renderTable();
-    }
-
-    function toggleMenu(e, id) {
-        e.stopPropagation();
-        document.querySelectorAll('.menu-dropdown').forEach(m => { if(m.id !== `menu-${id}`) m.classList.remove('show'); });
-        document.getElementById(`menu-${id}`).classList.toggle('show');
-    }
-
-    window.onclick = () => document.querySelectorAll('.menu-dropdown').forEach(m => m.classList.remove('show'));
-
-    function handleSearch() {
-        currentSearchTerm = document.getElementById('searchInput').value;
-        const q = toEnglishNumber(currentSearchTerm).toLowerCase();
-        filteredData = ppoData.filter(i => 
-            i.name.toLowerCase().includes(q) || 
-            toEnglishNumber(i.ppoNo).toString().includes(q) || 
-            i.id.toString() === q
-        );
-        currentPage = 1;
-        renderTable();
+    function updateUI() {
+        document.getElementById('totalPageBn').innerText = toBn(totalPages);
+        document.getElementById('goToPage').value = currentPage;
+        document.getElementById('prevBtn').disabled = currentPage === 1;
+        document.getElementById('nextBtn').disabled = currentPage >= totalPages;
+        document.getElementById('total').innerText = toBn(ppoData.length);
+        document.getElementById('saved').innerText = toBn(ppoData.filter(x => x.status === 'সংরক্ষিত').length);
+        document.getElementById('dist').innerText = toBn(ppoData.filter(x => x.status === 'বিতরণকৃত').length);
     }
 
     function changePage(dir) { currentPage += dir; renderTable(); }
+    function jumpToPage(p) { if(p >= 1 && p <= totalPages) { currentPage = parseInt(p); renderTable(); } }
 
-    function updatePaginationUI() {
-        const totalPages = Math.ceil(filteredData.length / rowsPerPage);
-        document.getElementById('pageInfoBn').innerText = toBengaliNumber(currentPage);
-        document.getElementById('prevBtn').disabled = currentPage === 1;
-        document.getElementById('nextBtn').disabled = currentPage >= totalPages || totalPages === 0;
+    function showSection(s) { 
+        document.getElementById('homeSection').style.display = s === 'home' ? 'block' : 'none'; 
+        document.getElementById('entrySection').style.display = s === 'entry' ? 'block' : 'none'; 
     }
 
+    function openForm() { 
+        document.getElementById('ppoForm').reset(); 
+        document.getElementById('oldId').value = ""; 
+        document.getElementById('pId').readOnly = false;
+        document.getElementById('pName').readOnly = false;
+        document.getElementById('pNo').readOnly = false;
+        showSection('entry'); 
+    }
+
+    function editRow(id) {
+        const item = ppoData.find(x => x.id == id);
+        showSection('entry');
+        document.getElementById('formTitle').innerText = "তথ্য সংশোধন";
+        document.getElementById('oldId').value = item.id;
+        document.getElementById('pId').value = item.id; document.getElementById('pId').readOnly = true;
+        document.getElementById('pName').value = item.name; document.getElementById('pName').readOnly = true;
+        document.getElementById('pNo').value = item.ppoNo; document.getElementById('pNo').readOnly = true;
+        document.getElementById('pStatus').value = item.status;
+        document.getElementById('pDate').value = item.deliveryDate ? item.deliveryDate.split('T')[0] : '';
+        document.getElementById('pNote').value = item.note || '';
+    }
+
+    function deleteRow(id) { if(confirm("মুছে ফেলবেন?")) { showLoading(true); fetch(scriptURL, { method: 'POST', body: JSON.stringify({action: "delete", id: id}) }).then(() => fetchData()); } }
+    
     document.getElementById('ppoForm').onsubmit = function(e) {
         e.preventDefault();
         showLoading(true);
-        const oldId = document.getElementById('oldId').value;
         const obj = {
-            action: oldId ? "edit" : "add", oldId: oldId,
+            action: document.getElementById('oldId').value ? "edit" : "add",
+            oldId: document.getElementById('oldId').value,
             id: document.getElementById('pId').value,
             name: document.getElementById('pName').value,
             ppoNo: document.getElementById('pNo').value,
@@ -347,46 +318,11 @@
             deliveryDate: document.getElementById('pDate').value,
             note: document.getElementById('pNote').value
         };
-        fetch(scriptURL, { method: 'POST', body: JSON.stringify(obj) }).then(() => {
-            alert("সফল হয়েছে!");
-            showSection('home');
-            fetchData();
-        });
+        fetch(scriptURL, { method: 'POST', body: JSON.stringify(obj) }).then(() => { showSection('home'); fetchData(); });
     };
 
-    function editRow(id) {
-        const item = ppoData.find(x => x.id == id);
-        showSection('entry');
-        document.getElementById('formTitle').innerText = "তথ্য সংশোধন";
-        document.getElementById('oldId').value = item.id;
-        document.getElementById('pId').value = item.id;
-        document.getElementById('pName').value = item.name;
-        document.getElementById('pNo').value = item.ppoNo;
-        document.getElementById('pStatus').value = item.status;
-        document.getElementById('pDate').value = item.deliveryDate ? item.deliveryDate.split('T')[0] : '';
-        document.getElementById('pNote').value = item.note || '';
-    }
-
-    function deleteRow(id) {
-        if(confirm("মুছে ফেলবেন?")) {
-            showLoading(true);
-            fetch(scriptURL, { method: 'POST', body: JSON.stringify({action: "delete", id: id}) }).then(() => fetchData());
-        }
-    }
-
-    function showSection(s) {
-        document.getElementById('homeSection').style.display = s === 'home' ? 'block' : 'none';
-        document.getElementById('entrySection').style.display = s === 'entry' ? 'block' : 'none';
-    }
-    function openForm() { document.getElementById('ppoForm').reset(); document.getElementById('oldId').value = ""; showSection('entry'); }
     function showLoading(s) { document.getElementById('loadingOverlay').style.display = s ? 'flex' : 'none'; }
-    function refreshPage() { fetchData(); }
-    function updateCounts() {
-        document.getElementById('total').innerText = toBengaliNumber(ppoData.length);
-        document.getElementById('saved').innerText = toBengaliNumber(ppoData.filter(x => x.status === 'সংরক্ষিত').length);
-        document.getElementById('dist').innerText = toBengaliNumber(ppoData.filter(x => x.status === 'বিতরণকৃত').length);
-    }
+    function printReport() { renderTable(filteredData); window.print(); renderTable(); }
 </script>
-
 </body>
 </html>
