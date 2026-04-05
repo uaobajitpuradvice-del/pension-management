@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PPO ম্যানেজমেন্ট সিস্টেম - স্মার্ট সার্চ</title>
+    <title>PPO ম্যানেজমেন্ট সিস্টেম - স্মার্ট এডিট</title>
     <style>
         :root {
             --primary-blue: #2563eb;
@@ -73,6 +73,9 @@
         .page-btn { padding: 10px 20px; border-radius: 12px; border: 1px solid #cbd5e1; background: white; cursor: pointer; font-weight: 600; }
         .page-btn:hover:not(:disabled) { background: var(--dark-blue); color: white; }
 
+        /* Form Styling */
+        input[readonly] { background-color: #f1f5f9; cursor: not-allowed; border: 1px solid #cbd5e1; color: #64748b; }
+
         @media print {
             nav, .search-section, .pagination, .action-col { display: none !important; }
             table { border: 2px solid black; }
@@ -85,7 +88,7 @@
 <div id="loadingOverlay" style="position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(255,255,255,0.8); display:none; justify-content:center; align-items:center; z-index:9999;"><b>🔄 ডাটা প্রসেসিং...</b></div>
 
 <nav>
-    <div class="nav-brand">📂 PPO ড্যাশবোর্ড</div>
+    <div class="nav-brand">📂 স্মার্ট পিপিও ম্যানেজমেন্ট</div>
     <div class="nav-stats-container">
         <button class="refresh-btn" id="refreshBtn" onclick="fetchData()">
             <span id="refreshIcon">🔄</span> রিফ্রেশ
@@ -96,17 +99,17 @@
     </div>
     <div style="display:flex; gap:10px;">
         <button class="page-btn" onclick="showSection('home')">🏠 হোম</button>
-        <button class="page-btn" style="background:var(--primary-blue); color:white;" onclick="openForm()">➕ নতুন</button>
+        <button class="page-btn" style="background:var(--primary-blue); color:white;" onclick="openForm()">➕ নতুন এন্ট্রি</button>
     </div>
 </nav>
 
 <div class="office-header">
-    <h1 class="office-name">উপজেলা হিসাবরক্ষণ অফিস, বাজিতপুর</h1>
-    <p style="font-size: 20px; color: #64748b; margin-top: 10px;">স্মার্ট পিপিও ম্যানেজমেন্ট সিস্টেম</p>
+    <h1 class="office-name">উপজেলা হিসাবরক্ষণ অফিস, বাজিতপুর, কিশোরগঞ্জ।</h1>
+    <p style="font-size: 20px; color: #64748b; margin-top: 10px;">পিপিও ম্যানেজমেন্ট সিস্টেম</p>
 </div>
 
 <div class="search-section">
-    <input type="text" id="searchInput" placeholder="🔎 নাম বা পিপিও (ইংরেজি/বাংলা) লিখে খুঁজুন..." onkeyup="handleSearch()">
+    <input type="text" id="searchInput" placeholder="🔎 নাম বা পিপিও লিখে খুঁজুন..." onkeyup="handleSearch()">
     <select id="filterStatus" onchange="handleSearch()">
         <option value="all">সব তথ্য</option>
         <option value="সংরক্ষিত">সংরক্ষিত</option>
@@ -125,7 +128,7 @@
                         <th style="text-align:left; padding-left:20px;">নাম</th>
                         <th>পিপিও নম্বর</th>
                         <th>অবস্থা</th>
-                        <th>তারিখ</th>
+                        <th> ডেলিভারির তারিখ</th>
                         <th class="action-col" width="100">অ্যাকশন</th>
                     </tr>
                 </thead>
@@ -142,12 +145,12 @@
 
     <div id="entrySection" style="display:none;">
         <div style="background:white; padding:40px; border-radius:20px; max-width:600px; margin:0 auto; box-shadow:var(--shadow-lg);">
-            <h2 id="formTitle" style="text-align:center; color:var(--dark-blue);">ডাটা এন্ট্রি</h2>
+            <h2 id="formTitle" style="text-align:center; color:var(--dark-blue);">তথ্য এন্ট্রি</h2>
             <form id="ppoForm">
                 <input type="hidden" id="oldId">
-                <div style="margin-bottom:15px;"><label>ক্রমিক নং</label><input type="number" id="pId" required style="width:100%; padding:10px; border-radius:8px; border:1px solid #ddd;"></div>
-                <div style="margin-bottom:15px;"><label>নাম</label><input type="text" id="pName" required style="width:100%; padding:10px; border-radius:8px; border:1px solid #ddd;"></div>
-                <div style="margin-bottom:15px;"><label>পিপিও নম্বর</label><input type="text" id="pNo" required style="width:100%; padding:10px; border-radius:8px; border:1px solid #ddd;"></div>
+                <div style="margin-bottom:15px;"><label>ক্রমিক নং</label><input type="number" id="pId" required style="width:100%; padding:10px; border-radius:8px;"></div>
+                <div style="margin-bottom:15px;"><label>নাম</label><input type="text" id="pName" required style="width:100%; padding:10px; border-radius:8px;"></div>
+                <div style="margin-bottom:15px;"><label>পিপিও নম্বর</label><input type="text" id="pNo" required style="width:100%; padding:10px; border-radius:8px;"></div>
                 <div style="margin-bottom:15px;"><label>অবস্থা</label>
                     <select id="pStatus" style="width:100%; padding:10px; border-radius:8px; border:1px solid #ddd;">
                         <option value="সংরক্ষিত">সংরক্ষিত</option>
@@ -204,16 +207,12 @@
             const valName = item.name.toLowerCase();
             const valPpo = item.ppoNo.toString();
             const valId = item.id.toString();
-
-            // নাম অথবা আইডি/পিপিও (বাংলা বা ইংরেজি উভয় ফরমেটেই) চেক করা হচ্ছে
             const matchesSearch = valName.includes(term.toLowerCase()) || 
                                  valPpo.includes(termEn) || valPpo.includes(termBn) ||
                                  valId.includes(termEn) || valId.includes(termBn);
-            
             const matchesFilter = statusFilter === 'all' || item.status === statusFilter;
             return matchesSearch && matchesFilter;
         });
-        
         totalPages = Math.ceil(filteredData.length / rowsPerPage) || 1;
         currentPage = 1;
         renderTable();
@@ -261,20 +260,30 @@
     function openForm() { 
         document.getElementById('ppoForm').reset(); 
         document.getElementById('oldId').value = ""; 
+        // নতুন এন্ট্রি তে সব খোলা থাকবে
         document.getElementById('pId').readOnly = false;
         document.getElementById('pName').readOnly = false;
         document.getElementById('pNo').readOnly = false;
+        document.getElementById('formTitle').innerText = "নতুন ডাটা এন্ট্রি";
         showSection('entry'); 
     }
 
     function editRow(id) {
         const item = ppoData.find(x => x.id == id);
         showSection('entry');
-        document.getElementById('formTitle').innerText = "তথ্য সংশোধন";
+        document.getElementById('formTitle').innerText = "তথ্য সংশোধন (লকড)";
         document.getElementById('oldId').value = item.id;
-        document.getElementById('pId').value = item.id; document.getElementById('pId').readOnly = true;
-        document.getElementById('pName').value = item.name; document.getElementById('pName').readOnly = true;
-        document.getElementById('pNo').value = item.ppoNo; document.getElementById('pNo').readOnly = true;
+        
+        // এডিট মোড এ আইডি, নাম এবং পিপিও রিড-অনলি
+        document.getElementById('pId').value = item.id; 
+        document.getElementById('pId').readOnly = true;
+        
+        document.getElementById('pName').value = item.name; 
+        document.getElementById('pName').readOnly = true;
+        
+        document.getElementById('pNo').value = item.ppoNo; 
+        document.getElementById('pNo').readOnly = true;
+        
         document.getElementById('pStatus').value = item.status;
         document.getElementById('pDate').value = item.deliveryDate ? item.deliveryDate.split('T')[0] : '';
         document.getElementById('pNote').value = item.note || '';
