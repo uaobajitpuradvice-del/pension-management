@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PPO ম্যানেজমেন্ট সিস্টেম - স্মার্ট এডিট</title>
+    <title>PPO ম্যানেজমেন্ট সিস্টেম</title>
     <style>
         :root {
             --primary-blue: #2563eb;
@@ -11,7 +11,6 @@
             --bg-solid: #f1f5f9;
             --white: #ffffff;
             --success: #10b981;
-            --warning: #f59e0b;
             --highlight: #ffeb3b;
             --shadow-lg: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
         }
@@ -55,17 +54,17 @@
         .search-section { margin: 30px auto; display: flex; justify-content: center; gap: 15px; }
         #searchInput {
             width: 500px; padding: 18px 30px; font-size: 18px; border-radius: 50px;
-            border: 3px solid #cbd5e1; outline: none; transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            border: 3px solid #cbd5e1; outline: none; transition: 0.4s;
             box-shadow: 0 4px 6px rgba(0,0,0,0.05);
         }
-        #searchInput:focus { width: 600px; border-color: var(--primary-blue); box-shadow: 0 0 25px rgba(37, 99, 235, 0.2); }
+        #searchInput:focus { width: 600px; border-color: var(--primary-blue); }
 
         #filterStatus { padding: 15px 25px; border-radius: 50px; border: 3px solid var(--primary-blue); font-weight: bold; cursor: pointer; }
 
-        .container { max-width: 1400px; margin: 0 auto; padding-bottom: 60px; }
+        .container { max-width: 1500px; margin: 0 auto; padding-bottom: 60px; }
         .data-card { background: var(--white); border-radius: 20px; padding: 25px; box-shadow: var(--shadow-lg); }
         table { width: 100%; border-collapse: collapse; border: 2px solid #cbd5e1; }
-        th, td { padding: 15px; border: 1px solid #cbd5e1; text-align: center; }
+        th, td { padding: 12px 10px; border: 1px solid #cbd5e1; text-align: center; font-size: 15px; }
         th { background: #f8fafc; color: var(--dark-blue); }
         
         .hl { background-color: var(--highlight); padding: 2px; border-radius: 3px; font-weight: bold; }
@@ -73,7 +72,6 @@
         .page-btn { padding: 10px 20px; border-radius: 12px; border: 1px solid #cbd5e1; background: white; cursor: pointer; font-weight: 600; }
         .page-btn:hover:not(:disabled) { background: var(--dark-blue); color: white; }
 
-        /* Form Styling */
         input[readonly] { background-color: #f1f5f9; cursor: not-allowed; border: 1px solid #cbd5e1; color: #64748b; }
 
         @media print {
@@ -85,10 +83,10 @@
 </head>
 <body>
 
-<div id="loadingOverlay" style="position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(255,255,255,0.8); display:none; justify-content:center; align-items:center; z-index:9999;"><b>🔄 ডাটা প্রসেসিং...</b></div>
+<div id="loadingOverlay" style="position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(255,255,255,0.8); display:none; justify-content:center; align-items:center; z-index:9999;"><b>🔄 ডাটা প্রসেসিং হচ্ছে...</b></div>
 
 <nav>
-    <div class="nav-brand">📂 স্মার্ট পিপিও ম্যানেজমেন্ট</div>
+    <div class="nav-brand">📂 PPO ড্যাশবোর্ড</div>
     <div class="nav-stats-container">
         <button class="refresh-btn" id="refreshBtn" onclick="fetchData()">
             <span id="refreshIcon">🔄</span> রিফ্রেশ
@@ -105,7 +103,7 @@
 
 <div class="office-header">
     <h1 class="office-name">উপজেলা হিসাবরক্ষণ অফিস, বাজিতপুর, কিশোরগঞ্জ।</h1>
-    <p style="font-size: 20px; color: #64748b; margin-top: 10px;">পিপিও ম্যানেজমেন্ট সিস্টেম</p>
+    <p style="font-size: 20px; color: #64748b; margin-top: 10px;">অনলাইন পিপিও ম্যানেজমেন্ট</p>
 </div>
 
 <div class="search-section">
@@ -124,11 +122,12 @@
             <table>
                 <thead>
                     <tr>
-                        <th width="80">ক্রমিক</th>
+                        <th width="60">ক্রমিক</th>
                         <th style="text-align:left; padding-left:20px;">নাম</th>
                         <th>পিপিও নম্বর</th>
                         <th>অবস্থা</th>
-                        <th> ডেলিভারির তারিখ</th>
+                        <th> এন্ট্রি/ডেলিভারি তারিখ</th>
+                        <th>মন্তব্য</th>
                         <th class="action-col" width="100">অ্যাকশন</th>
                     </tr>
                 </thead>
@@ -148,9 +147,9 @@
             <h2 id="formTitle" style="text-align:center; color:var(--dark-blue);">তথ্য এন্ট্রি</h2>
             <form id="ppoForm">
                 <input type="hidden" id="oldId">
-                <div style="margin-bottom:15px;"><label>ক্রমিক নং</label><input type="number" id="pId" required style="width:100%; padding:10px; border-radius:8px;"></div>
-                <div style="margin-bottom:15px;"><label>নাম</label><input type="text" id="pName" required style="width:100%; padding:10px; border-radius:8px;"></div>
-                <div style="margin-bottom:15px;"><label>পিপিও নম্বর</label><input type="text" id="pNo" required style="width:100%; padding:10px; border-radius:8px;"></div>
+                <div style="margin-bottom:15px;"><label>ক্রমিক নং</label><input type="text" id="pId" required style="width:100%; padding:10px; border-radius:8px; border:1px solid #ddd;"></div>
+                <div style="margin-bottom:15px;"><label>নাম</label><input type="text" id="pName" required style="width:100%; padding:10px; border-radius:8px; border:1px solid #ddd;"></div>
+                <div style="margin-bottom:15px;"><label>পিপিও নম্বর</label><input type="text" id="pNo" required style="width:100%; padding:10px; border-radius:8px; border:1px solid #ddd;"></div>
                 <div style="margin-bottom:15px;"><label>অবস্থা</label>
                     <select id="pStatus" style="width:100%; padding:10px; border-radius:8px; border:1px solid #ddd;">
                         <option value="সংরক্ষিত">সংরক্ষিত</option>
@@ -177,6 +176,9 @@
     function toBn(n) { return n ? n.toString().replace(/\d/g, d => enToBn[d]) : '০'; }
     function toEn(n) { return n ? n.toString().replace(/[০-৯]/g, d => bnToEn[d]) : ''; }
 
+    // শিটে পাঠানোর আগে অবশ্যই বাংলায় রূপান্তরের জন্য ফাংশন
+    function forceBn(n) { return n ? n.toString().replace(/\d/g, d => enToBn[d]) : ''; }
+
     function highlight(text, term) {
         if (!term) return text;
         const regex = new RegExp(`(${term})`, 'gi');
@@ -190,7 +192,12 @@
         icon.classList.add('spin');
         showLoading(true);
         fetch(scriptURL).then(res => res.json()).then(data => {
-            ppoData = data.sort((a, b) => parseInt(a.id) - parseInt(b.id));
+            // ডাটা লোড করার সময় আইডি অনুসারে সাজানো
+            ppoData = data.sort((a, b) => {
+                let idA = toEn(a.id);
+                let idB = toEn(b.id);
+                return parseInt(idA) - parseInt(idB);
+            });
             handleSearch();
             showLoading(false);
             icon.classList.remove('spin');
@@ -231,6 +238,7 @@
                 <td>${toBn(item.ppoNo)}</td>
                 <td><span style="padding:5px 12px; border-radius:15px; font-size:12px; font-weight:bold; background:${item.status === 'সংরক্ষিত' ? '#dcfce7' : '#fef3c7'}; color:${item.status === 'সংরক্ষিত' ? '#166534' : '#92400e'}">${item.status}</span></td>
                 <td>${item.deliveryDate ? toBn(item.deliveryDate.split('T')[0]) : '---'}</td>
+                <td style="font-size: 14px;">${item.note || ''}</td>
                 <td class="action-col">
                     <button class="page-btn" style="padding:5px 10px;" onclick="editRow('${item.id}')">✏️</button>
                     <button class="page-btn" style="padding:5px 10px; color:red;" onclick="deleteRow('${item.id}')">🗑️</button>
@@ -260,7 +268,6 @@
     function openForm() { 
         document.getElementById('ppoForm').reset(); 
         document.getElementById('oldId').value = ""; 
-        // নতুন এন্ট্রি তে সব খোলা থাকবে
         document.getElementById('pId').readOnly = false;
         document.getElementById('pName').readOnly = false;
         document.getElementById('pNo').readOnly = false;
@@ -273,17 +280,9 @@
         showSection('entry');
         document.getElementById('formTitle').innerText = "তথ্য সংশোধন (লকড)";
         document.getElementById('oldId').value = item.id;
-        
-        // এডিট মোড এ আইডি, নাম এবং পিপিও রিড-অনলি
-        document.getElementById('pId').value = item.id; 
-        document.getElementById('pId').readOnly = true;
-        
-        document.getElementById('pName').value = item.name; 
-        document.getElementById('pName').readOnly = true;
-        
-        document.getElementById('pNo').value = item.ppoNo; 
-        document.getElementById('pNo').readOnly = true;
-        
+        document.getElementById('pId').value = toBn(item.id); document.getElementById('pId').readOnly = true;
+        document.getElementById('pName').value = item.name; document.getElementById('pName').readOnly = true;
+        document.getElementById('pNo').value = toBn(item.ppoNo); document.getElementById('pNo').readOnly = true;
         document.getElementById('pStatus').value = item.status;
         document.getElementById('pDate').value = item.deliveryDate ? item.deliveryDate.split('T')[0] : '';
         document.getElementById('pNote').value = item.note || '';
@@ -294,16 +293,22 @@
     document.getElementById('ppoForm').onsubmit = function(e) {
         e.preventDefault();
         showLoading(true);
+        
+        // শিটে পাঠানোর সময় আইডি এবং পিপিও নম্বরকে বাধ্যতামূলক বাংলায় রূপান্তর
+        const finalId = forceBn(document.getElementById('pId').value);
+        const finalPpo = forceBn(document.getElementById('pNo').value);
+
         const obj = {
             action: document.getElementById('oldId').value ? "edit" : "add",
             oldId: document.getElementById('oldId').value,
-            id: document.getElementById('pId').value,
+            id: finalId, // ক্রমিক নং বাংলায় যাবে
             name: document.getElementById('pName').value,
-            ppoNo: document.getElementById('pNo').value,
+            ppoNo: finalPpo, // পিপিও নম্বর বাংলায় যাবে
             status: document.getElementById('pStatus').value,
             deliveryDate: document.getElementById('pDate').value,
             note: document.getElementById('pNote').value
         };
+        
         fetch(scriptURL, { method: 'POST', body: JSON.stringify(obj) }).then(() => { showSection('home'); fetchData(); });
     };
 
