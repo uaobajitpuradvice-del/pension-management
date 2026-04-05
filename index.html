@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PPO ম্যানেজমেন্ট সিস্টেম - ক্লিন প্রো</title>
+    <title>PPO ম্যানেজমেন্ট সিস্টেম - স্মার্ট সার্চ</title>
     <style>
         :root {
             --primary-blue: #2563eb;
@@ -23,7 +23,6 @@
             font-size: 17px;
         }
 
-        /* Navbar */
         nav {
             background-color: var(--dark-blue);
             padding: 12px 30px;
@@ -38,38 +37,21 @@
         .nav-stats-container { display: flex; align-items: center; gap: 15px; }
         .nav-stat { background: rgba(255,255,255,0.1); padding: 5px 15px; border-radius: 20px; font-size: 14px; }
 
-        /* Refresh Button */
         .refresh-btn {
-            background: #10b981;
-            color: white;
-            border: none;
-            padding: 8px 15px;
-            border-radius: 8px;
-            cursor: pointer;
-            font-weight: bold;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            transition: 0.3s;
+            background: #10b981; color: white; border: none; padding: 8px 15px;
+            border-radius: 8px; cursor: pointer; font-weight: bold; display: flex; align-items: center; gap: 8px; transition: 0.3s;
         }
         .refresh-btn:hover { background: #059669; transform: scale(1.05); }
 
         .spin { animation: rotate 1s linear infinite; }
         @keyframes rotate { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
 
-        /* Header & Search */
         .office-header {
-            background: var(--white);
-            padding: 30px;
-            text-align: center;
-            margin: 20px auto;
-            max-width: 90%;
-            border-radius: 20px;
-            box-shadow: var(--shadow-lg);
+            background: var(--white); padding: 30px; text-align: center; margin: 20px auto;
+            max-width: 90%; border-radius: 20px; box-shadow: var(--shadow-lg);
         }
         .office-name { font-size: 35px; color: var(--dark-blue); margin: 0; font-weight: 800; }
 
-        /* Large Animated Search Bar */
         .search-section { margin: 30px auto; display: flex; justify-content: center; gap: 15px; }
         #searchInput {
             width: 500px; padding: 18px 30px; font-size: 18px; border-radius: 50px;
@@ -80,22 +62,16 @@
 
         #filterStatus { padding: 15px 25px; border-radius: 50px; border: 3px solid var(--primary-blue); font-weight: bold; cursor: pointer; }
 
-        /* Table Design */
         .container { max-width: 1400px; margin: 0 auto; padding-bottom: 60px; }
         .data-card { background: var(--white); border-radius: 20px; padding: 25px; box-shadow: var(--shadow-lg); }
         table { width: 100%; border-collapse: collapse; border: 2px solid #cbd5e1; }
         th, td { padding: 15px; border: 1px solid #cbd5e1; text-align: center; }
-        th { background: #f8fafc; color: var(--dark-blue); font-weight: 700; }
+        th { background: #f8fafc; color: var(--dark-blue); }
         
-        tr { transition: 0.2s; }
-        tr:hover { background-color: #f1f7ff; }
-
         .hl { background-color: var(--highlight); padding: 2px; border-radius: 3px; font-weight: bold; }
         
-        /* Form & Pagination */
         .page-btn { padding: 10px 20px; border-radius: 12px; border: 1px solid #cbd5e1; background: white; cursor: pointer; font-weight: 600; }
         .page-btn:hover:not(:disabled) { background: var(--dark-blue); color: white; }
-        #goToPage { width: 60px; padding: 8px; text-align: center; border-radius: 8px; border: 2px solid var(--primary-blue); font-weight: bold; }
 
         @media print {
             nav, .search-section, .pagination, .action-col { display: none !important; }
@@ -106,13 +82,13 @@
 </head>
 <body>
 
-<div id="loadingOverlay" style="position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(255,255,255,0.8); display:none; justify-content:center; align-items:center; z-index:9999;"><b>🔄 ডাটা প্রসেসিং হচ্ছে...</b></div>
+<div id="loadingOverlay" style="position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(255,255,255,0.8); display:none; justify-content:center; align-items:center; z-index:9999;"><b>🔄 ডাটা প্রসেসিং...</b></div>
 
 <nav>
     <div class="nav-brand">📂 PPO ড্যাশবোর্ড</div>
     <div class="nav-stats-container">
         <button class="refresh-btn" id="refreshBtn" onclick="fetchData()">
-            <span id="refreshIcon">🔄</span> রিফ্রেশ করুন
+            <span id="refreshIcon">🔄</span> রিফ্রেশ
         </button>
         <div class="nav-stat">মোট: <span id="total">০</span></div>
         <div class="nav-stat">সংরক্ষিত: <span id="saved">০</span></div>
@@ -120,23 +96,23 @@
     </div>
     <div style="display:flex; gap:10px;">
         <button class="page-btn" onclick="showSection('home')">🏠 হোম</button>
-        <button class="page-btn" style="background:var(--primary-blue); color:white;" onclick="openForm()">➕ নতুন এন্ট্রি</button>
+        <button class="page-btn" style="background:var(--primary-blue); color:white;" onclick="openForm()">➕ নতুন</button>
     </div>
 </nav>
 
 <div class="office-header">
     <h1 class="office-name">উপজেলা হিসাবরক্ষণ অফিস, বাজিতপুর</h1>
-    <p style="font-size: 20px; color: #64748b; margin-top: 10px;">অনলাইন পিপিও ম্যানেজমেন্ট সিস্টেম</p>
+    <p style="font-size: 20px; color: #64748b; margin-top: 10px;">স্মার্ট পিপিও ম্যানেজমেন্ট সিস্টেম</p>
 </div>
 
 <div class="search-section">
-    <input type="text" id="searchInput" placeholder="🔎 নাম বা পিপিও নম্বর লিখে খুঁজুন..." onkeyup="handleSearch()">
+    <input type="text" id="searchInput" placeholder="🔎 নাম বা পিপিও (ইংরেজি/বাংলা) লিখে খুঁজুন..." onkeyup="handleSearch()">
     <select id="filterStatus" onchange="handleSearch()">
-        <option value="all">সব রেকর্ড</option>
-        <option value="সংরক্ষিত">📥 সংরক্ষিত</option>
-        <option value="বিতরণকৃত">📤 বিতরণকৃত</option>
+        <option value="all">সব তথ্য</option>
+        <option value="সংরক্ষিত">সংরক্ষিত</option>
+        <option value="বিতরণকৃত">বিতরণকৃত</option>
     </select>
-    <button class="page-btn" style="background: #ef4444; color: white;" onclick="printReport()">🖨️ প্রিন্ট করুন</button>
+    <button class="page-btn" style="background: #ef4444; color: white;" onclick="printReport()">🖨️ প্রিন্ট</button>
 </div>
 
 <div class="container">
@@ -153,21 +129,20 @@
                         <th class="action-col" width="100">অ্যাকশন</th>
                     </tr>
                 </thead>
-                <tbody id="tableBody">
-                    </tbody>
+                <tbody id="tableBody"></tbody>
             </table>
             
             <div style="margin-top: 30px; display: flex; justify-content: center; gap: 15px; align-items: center;">
                 <button id="prevBtn" class="page-btn" onclick="changePage(-1)">⇠ পূর্ববর্তী</button>
-                <span>পৃষ্ঠা: <input type="number" id="goToPage" min="1" onchange="jumpToPage(this.value)"> / <b id="totalPageBn">১</b></span>
+                <span>পৃষ্ঠা: <b id="currentPageBn">১</b> / <b id="totalPageBn">১</b></span>
                 <button id="nextBtn" class="page-btn" onclick="changePage(1)">পরবর্তী ⇢</button>
             </div>
         </div>
     </div>
 
-    <div id="entrySection" style="display:none; animation: fadeIn 0.5s;">
+    <div id="entrySection" style="display:none;">
         <div style="background:white; padding:40px; border-radius:20px; max-width:600px; margin:0 auto; box-shadow:var(--shadow-lg);">
-            <h2 id="formTitle" style="text-align:center; color:var(--dark-blue);">নতুন ডাটা এন্ট্রি</h2>
+            <h2 id="formTitle" style="text-align:center; color:var(--dark-blue);">ডাটা এন্ট্রি</h2>
             <form id="ppoForm">
                 <input type="hidden" id="oldId">
                 <div style="margin-bottom:15px;"><label>ক্রমিক নং</label><input type="number" id="pId" required style="width:100%; padding:10px; border-radius:8px; border:1px solid #ddd;"></div>
@@ -194,7 +169,10 @@
     const rowsPerPage = 20;
 
     const enToBn = { '0':'০', '1':'১', '2':'২', '3':'৩', '4':'৪', '5':'৫', '6':'৬', '7':'৭', '8':'৮', '9':'৯' };
+    const bnToEn = { '০':'0', '১':'1', '২':'2', '৩':'3', '৪':'4', '৫':'5', '৬':'6', '৭':'7', '৮':'8', '৯':'9' };
+
     function toBn(n) { return n ? n.toString().replace(/\d/g, d => enToBn[d]) : '০'; }
+    function toEn(n) { return n ? n.toString().replace(/[০-৯]/g, d => bnToEn[d]) : ''; }
 
     function highlight(text, term) {
         if (!term) return text;
@@ -208,25 +186,30 @@
         const icon = document.getElementById('refreshIcon');
         icon.classList.add('spin');
         showLoading(true);
-
         fetch(scriptURL).then(res => res.json()).then(data => {
-            // ডাটা আইডি অনুযায়ী সর্টিং
             ppoData = data.sort((a, b) => parseInt(a.id) - parseInt(b.id));
             handleSearch();
             showLoading(false);
             icon.classList.remove('spin');
-        }).catch(() => {
-            showLoading(false);
-            icon.classList.remove('spin');
-        });
+        }).catch(() => { showLoading(false); icon.classList.remove('spin'); });
     }
 
     function handleSearch() {
         const term = document.getElementById('searchInput').value.trim();
+        const termEn = toEn(term);
+        const termBn = toBn(term);
         const statusFilter = document.getElementById('filterStatus').value;
         
         filteredData = ppoData.filter(item => {
-            const matchesSearch = item.name.toLowerCase().includes(term.toLowerCase()) || item.ppoNo.toString().includes(term);
+            const valName = item.name.toLowerCase();
+            const valPpo = item.ppoNo.toString();
+            const valId = item.id.toString();
+
+            // নাম অথবা আইডি/পিপিও (বাংলা বা ইংরেজি উভয় ফরমেটেই) চেক করা হচ্ছে
+            const matchesSearch = valName.includes(term.toLowerCase()) || 
+                                 valPpo.includes(termEn) || valPpo.includes(termBn) ||
+                                 valId.includes(termEn) || valId.includes(termBn);
+            
             const matchesFilter = statusFilter === 'all' || item.status === statusFilter;
             return matchesSearch && matchesFilter;
         });
@@ -242,30 +225,26 @@
         const term = document.getElementById('searchInput').value;
         const data = dataToRender || filteredData.slice((currentPage - 1) * rowsPerPage, currentPage * rowsPerPage);
 
-        if(data.length === 0) {
-            tbody.innerHTML = `<tr><td colspan="6">কোন তথ্য পাওয়া যায়নি।</td></tr>`;
-        } else {
-            data.forEach(item => {
-                const row = `<tr>
-                    <td><b>${toBn(item.id)}</b></td>
-                    <td style="text-align:left; padding-left:20px;">${highlight(item.name, term)}</td>
-                    <td>${highlight(toBn(item.ppoNo), toBn(term))}</td>
-                    <td><span style="padding:5px 12px; border-radius:15px; font-size:12px; font-weight:bold; background:${item.status === 'সংরক্ষিত' ? '#dcfce7' : '#fef3c7'}; color:${item.status === 'সংরক্ষিত' ? '#166534' : '#92400e'}">${item.status}</span></td>
-                    <td>${item.deliveryDate ? toBn(item.deliveryDate.split('T')[0]) : '---'}</td>
-                    <td class="action-col">
-                        <button class="page-btn" style="padding:5px 10px;" onclick="editRow('${item.id}')">✏️</button>
-                        <button class="page-btn" style="padding:5px 10px; color:red;" onclick="deleteRow('${item.id}')">🗑️</button>
-                    </td>
-                </tr>`;
-                tbody.innerHTML += row;
-            });
-        }
+        data.forEach(item => {
+            const row = `<tr>
+                <td><b>${toBn(item.id)}</b></td>
+                <td style="text-align:left; padding-left:20px;">${highlight(item.name, term)}</td>
+                <td>${toBn(item.ppoNo)}</td>
+                <td><span style="padding:5px 12px; border-radius:15px; font-size:12px; font-weight:bold; background:${item.status === 'সংরক্ষিত' ? '#dcfce7' : '#fef3c7'}; color:${item.status === 'সংরক্ষিত' ? '#166534' : '#92400e'}">${item.status}</span></td>
+                <td>${item.deliveryDate ? toBn(item.deliveryDate.split('T')[0]) : '---'}</td>
+                <td class="action-col">
+                    <button class="page-btn" style="padding:5px 10px;" onclick="editRow('${item.id}')">✏️</button>
+                    <button class="page-btn" style="padding:5px 10px; color:red;" onclick="deleteRow('${item.id}')">🗑️</button>
+                </td>
+            </tr>`;
+            tbody.innerHTML += row;
+        });
         if(!dataToRender) updateUI();
     }
 
     function updateUI() {
         document.getElementById('totalPageBn').innerText = toBn(totalPages);
-        document.getElementById('goToPage').value = currentPage;
+        document.getElementById('currentPageBn').innerText = toBn(currentPage);
         document.getElementById('prevBtn').disabled = currentPage === 1;
         document.getElementById('nextBtn').disabled = currentPage >= totalPages;
         document.getElementById('total').innerText = toBn(ppoData.length);
@@ -274,8 +253,6 @@
     }
 
     function changePage(dir) { currentPage += dir; renderTable(); }
-    function jumpToPage(p) { if(p >= 1 && p <= totalPages) { currentPage = parseInt(p); renderTable(); } }
-
     function showSection(s) { 
         document.getElementById('homeSection').style.display = s === 'home' ? 'block' : 'none'; 
         document.getElementById('entrySection').style.display = s === 'entry' ? 'block' : 'none'; 
