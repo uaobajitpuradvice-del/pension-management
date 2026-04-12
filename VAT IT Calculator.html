@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ভ্যাট ও আয়কর কর্তনের হার</title>
+    <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #1e3a8a;
+            --secondary: #2563eb;
+            --success: #059669;
+            --danger: #dc2626;
+            --glass: rgba(255, 255, 255, 0.92);
+        }
+
+        body {
+            font-family: 'Hind Siliguri', sans-serif;
+            /* প্রাকৃতিক দৃশ্য ব্যাকগ্রাউন্ড */
+            background: linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.3)), 
+                        url('https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?auto=format&fit=crop&w=1920&q=80');
+            background-size: cover;
+            background-attachment: fixed;
+            background-position: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 40px 20px;
+            color: #111827;
+        }
+
+        /* ফ্লোটিং বাটন */
+        .fab-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            z-index: 1000;
+        }
+
+        .fab {
+            width: 55px;
+            height: 55px;
+            border-radius: 50%;
+            border: 2px solid white;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.3);
+            transition: 0.3s;
+            color: white;
+        }
+
+        .fab:hover { transform: scale(1.15); rotate: 5deg; }
+        .fab-settings { background: #4b5563; }
+        .fab-print { background: var(--primary); }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: var(--glass);
+            border-radius: 25px;
+            padding: 40px;
+            box-shadow: 0 30px 60px rgba(0,0,0,0.4);
+            backdrop-filter: blur(10px);
+            animation: fadeIn 0.8s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        h2 {
+            text-align: center;
+            font-size: 32px; /* বড় ফন্ট সাইজ */
+            margin-top: 0;
+            color: var(--primary);
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+            border-bottom: 3px solid var(--secondary);
+            padding-bottom: 15px;
+        }
+
+        /* ইনপুট সেকশন */
+        .main-card {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 25px;
+            margin-bottom: 40px;
+        }
+
+        label {
+            display: block;
+            font-weight: 700;
+            margin-bottom: 10px;
+            color: #1f2937;
+            font-size: 18px; /* বড় ফন্ট সাইজ */
+        }
+
+        select, input {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #94a3b8;
+            border-radius: 12px;
+            font-size: 18px;
+            font-family: 'Hind Siliguri', sans-serif;
+            transition: 0.3s;
+        }
+
+        select:focus, input:focus { border-color: var(--secondary); outline: none; box-shadow: 0 0 10px rgba(37, 99, 235, 0.2); }
+
+        /* রেজাল্ট ডিসপ্লে */
+        .result-grid {
+            grid-column: span 2;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .res-item {
+            background: white;
+            padding: 20px;
+            border-radius: 18px;
+            text-align: center;
+            border: 2px solid #e5e7eb;
+            transition: 0.3s;
+        }
+
+        .res-item:hover { border-color: var(--secondary); transform: translateY(-5px); }
+
+        .res-item span { display: block; font-size: 15px; color: #4b5563; font-weight: bold; margin-bottom: 8px; }
+        .res-item b { font-size: 22px; color: #111827; }
+
+        .res-net {
+            grid-column: 1 / -1;
+            background: var(--success);
+            color: white;
+            padding: 25px;
+        }
+        .res-net b { color: white; font-size: 38px; }
+
+        /* টেবিল ডিজাইন (বর্ডার ও বড় হেডার) */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 30px;
+            background: white;
+            border: 2px solid #334155; /* টেবিলের চারপাশে বর্ডার */
+        }
+
+        th {
+            background: #334155;
+            color: white;
+            padding: 18px 10px;
+            font-size: 18px; /* বড় হেডার */
+            text-transform: uppercase;
+            border: 1px solid #ffffff;
+        }
+
+        td {
+            padding: 15px 10px;
+            border: 1px solid #cbd5e1; /* সেলের বর্ডার */
+            text-align: center;
+            font-size: 17px;
+            color: #334155;
+        }
+
+        tr:nth-child(even) { background-color: #f8fafc; }
+        tr:hover { background-color: #f1f5f9; }
+
+        .badge { background: var(--secondary); color: white; padding: 3px 8px; border-radius: 6px; font-size: 13px; font-weight: bold; }
+
+        /* প্রিন্ট হেডার */
+        .print-header {
+            display: none;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        @media print {
+            .no-print, .fab-container, h2 { display: none !important; }
+            .print-header { display: block !important; }
+            body { background: white; padding: 0; }
+            .container { box-shadow: none; max-width: 100%; border-radius: 0; padding: 0; background: white; }
+            table { border: 2px solid #000; }
+            th, td { border: 1px solid #000; color: black; }
+            th { background: #eee !important; color: black; }
+        }
+
+        /* সেটিংস মডাল */
+        #settingsOverlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.7);
+            backdrop-filter: blur(8px);
+            z-index: 2000;
+        }
+
+        .settings-content {
+            background: white;
+            width: 90%;
+            max-width: 600px;
+            margin: 40px auto;
+            border-radius: 25px;
+            padding: 35px;
+            max-height: 85vh;
+            overflow-y: auto;
+        }
+    </style>
+</head>
+<body>
+
+<div class="fab-container no-print">
+    <button class="fab fab-print" title="প্রিন্ট করুন" onclick="window.print()">🖨️</button>
+    <button class="fab fab-settings" title="কন্ট্রোল প্যানেল" onclick="toggleSettings()">⚙️</button>
+</div>
+
+<div class="container">
+    <div class="print-header">
+        <h1 style="font-size: 30px; margin:0;">ভ্যাট ও আয়কর কর্তনের হার</h1>
+        <p style="font-size: 22px; margin: 10px 0;">অর্থ বছর: <span id="reportFY_Print">২০২৫-২৬</span></p>
+    </div>
+
+    <div class="no-print">
+        <h2> 📠 ভ্যাট ও ট্যাক্স ক্যালকুলেটর (<span id="currentFY">২০২৫-২৬</span>)</h2>
+        
+        <div class="main-card">
+            <div class="input-box">
+                <label>অর্থনৈতিক কোড বেছে নিন</label>
+                <select id="selectCode" onchange="calculate()">
+                    <option value="">কোড সিলেক্ট করুন</option>
+                </select>
+            </div>
+            <div class="input-box">
+                <label>মোট বিলের পরিমাণ (Gross Amount)</label>
+                <input type="number" id="grossAmount" placeholder="0.00" oninput="calculate()">
+            </div>
+
+            <div class="result-grid" id="calcResults">
+                <p style="grid-column: 1/-1; text-align: center; color: #64748b; font-size: 18px;">সঠিক ফলাফল দেখতে উপরে তথ্য দিন</p>
+            </div>
+        </div>
+    </div>
+
+    <table>
+        <thead>
+            <tr>
+                <th>কোড</th>
+                <th>বিবরণ</th>
+                <th>আইটি</th>
+                <th>ভ্যাট</th>
+                <th>অন্যান্য</th>
+                <th>মন্তব্য</th>
+                <th class="no-print">অ্যাকশন</th>
+            </tr>
+        </thead>
+        <tbody id="tableBody"></tbody>
+    </table>
+</div>
+
+<div id="settingsOverlay" onclick="closeSettings(event)">
+    <div class="settings-content" onclick="event.stopPropagation()">
+        <h3 style="margin-top:0; font-size: 24px; color: var(--primary);">⚙️ কন্ট্রোল প্যানেল</h3>
+        <hr>
+        <div style="margin-bottom: 25px;">
+            <label>অর্থ বছর পরিবর্তন</label>
+            <input type="text" id="fyInput" placeholder="উদা: ২০২৬-২৭" onchange="updateFY()">
+        </div>
+        
+        <h4 style="font-size: 20px;">নতুন আইটেম যোগ করুন</h4>
+        <div style="display:grid; gap:15px;">
+            <input type="text" id="newCode" placeholder="অর্থনৈতিক কোড">
+            <input type="text" id="newDesc" placeholder="বিবরণ">
+            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:15px;">
+                <input type="number" id="newTax" placeholder="আইটি %">
+                <input type="number" id="newVat" placeholder="ভ্যাট %">
+            </div>
+            <div style="display:grid; grid-template-columns: 1.5fr 1fr; gap:15px;">
+                <input type="text" id="customName" placeholder="অন্যান্য কর্তন (নাম)">
+                <input type="number" id="customRate" placeholder="%">
+            </div>
+            <input type="text" id="newComment" placeholder="মন্তব্য">
+            <button onclick="addEntry()" style="background:var(--success); color:white; border:none; padding:15px; border-radius:12px; cursor:pointer; font-weight:bold; font-size:18px;">সেভ ও বিন্যাস করুন</button>
+            <button onclick="toggleSettings()" style="background:#e5e7eb; color:#374151; border:none; padding:12px; border-radius:12px; cursor:pointer; font-size:16px;">বন্ধ করুন</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    let appData = JSON.parse(localStorage.getItem('vat_it_v7')) || {
+        fiscalYear: "২০২৫-২৬",
+        codes: [
+            {code: "3211113", desc: "কম্পিউটার সামগ্রী", tax: 5, vat: 7.5, cName: "স্ট্যাম্প", cRate: 0, comment: "উৎস কর্তন"},
+            {code: "3211125", desc: "প্রচার ও বিজ্ঞাপন", tax: 5, vat: 15, cName: "সার্ভিস চার্জ", cRate: 10, comment: "বিশেষ কোড"},
+            {code: "3255105", desc: "আসবাবপত্র", tax: 2, vat: 15, cName: "অন্যান্য", cRate: 0, comment: "সাধারণ"}
+        ]
+    };
+
+    function toggleSettings() {
+        const overlay = document.getElementById('settingsOverlay');
+        overlay.style.display = (overlay.style.display === 'block') ? 'none' : 'block';
+    }
+
+    function closeSettings() {
+        document.getElementById('settingsOverlay').style.display = 'none';
+    }
+
+    function updateFY() {
+        const val = document.getElementById('fyInput').value;
+        if(val) {
+            appData.fiscalYear = val;
+            saveAndRender();
+        }
+    }
+
+    function saveAndRender() {
+        appData.codes.sort((a, b) => a.code.localeCompare(b.code, 'bn', {numeric: true}));
+        localStorage.setItem('vat_it_v7', JSON.stringify(appData));
+        render();
+    }
+
+    function render() {
+        document.getElementById('currentFY').innerText = appData.fiscalYear;
+        document.getElementById('reportFY_Print').innerText = appData.fiscalYear;
+        document.getElementById('fyInput').value = appData.fiscalYear;
+
+        const tableBody = document.getElementById('tableBody');
+        const select = document.getElementById('selectCode');
+        tableBody.innerHTML = "";
+        select.innerHTML = '<option value="">কোড সিলেক্ট করুন</option>';
+
+        appData.codes.forEach((item, index) => {
+            tableBody.innerHTML += `
+                <tr>
+                    <td><b>${item.code}</b></td>
+                    <td>${item.desc}</td>
+                    <td>${item.tax}%</td>
+                    <td>${item.vat}%</td>
+                    <td>${item.cName}: ${item.cRate}%</td>
+                    <td>${item.comment || '-'}</td>
+                    <td class="no-print">
+                        <button onclick="deleteEntry(${index})" style="border:none; background:none; cursor:pointer; font-size:20px;">🗑️</button>
+                    </td>
+                </tr>
+            `;
+            select.innerHTML += `<option value="${index}">${item.code} - ${item.desc}</option>`;
+        });
+    }
+
+    function addEntry() {
+        const code = document.getElementById('newCode').value;
+        const desc = document.getElementById('newDesc').value;
+        const tax = parseFloat(document.getElementById('newTax').value) || 0;
+        const vat = parseFloat(document.getElementById('newVat').value) || 0;
+        const cName = document.getElementById('customName').value || "অন্যান্য";
+        const cRate = parseFloat(document.getElementById('customRate').value) || 0;
+        const comment = document.getElementById('newComment').value;
+
+        if(code && desc) {
+            appData.codes.push({code, desc, tax, vat, cName, cRate, comment});
+            saveAndRender();
+            document.querySelectorAll('.settings-content input:not(#fyInput)').forEach(i => i.value = '');
+            toggleSettings();
+        }
+    }
+
+    function deleteEntry(i) {
+        if(confirm("আপনি কি এটি মুছে ফেলতে চান?")) {
+            appData.codes.splice(i, 1);
+            saveAndRender();
+        }
+    }
+
+    function calculate() {
+        const index = document.getElementById('selectCode').value;
+        const gross = parseFloat(document.getElementById('grossAmount').value) || 0;
+        const resultDiv = document.getElementById('calcResults');
+
+        if(index !== "") {
+            const item = appData.codes[index];
+            const tAmt = (gross * item.tax) / 100;
+            const vAmt = (gross * item.vat) / 100;
+            const cAmt = (gross * item.cRate) / 100;
+            const total = tAmt + vAmt + cAmt;
+            const net = gross - total;
+
+            resultDiv.innerHTML = `
+                <div class="res-item">
+                    <span>আয়কর (IT) <small class="badge">${item.tax}%</small></span>
+                    <b>${tAmt.toLocaleString('bn-BD', {minimumFractionDigits: 2})}</b>
+                </div>
+                <div class="res-item">
+                    <span>ভ্যাট (VAT) <small class="badge">${item.vat}%</small></span>
+                    <b>${vAmt.toLocaleString('bn-BD', {minimumFractionDigits: 2})}</b>
+                </div>
+                <div class="res-item">
+                    <span>${item.cName} <small class="badge">${item.cRate}%</small></span>
+                    <b>${cAmt.toLocaleString('bn-BD', {minimumFractionDigits: 2})}</b>
+                </div>
+                <div class="res-item">
+                    <span>মোট কর্তন</span>
+                    <b style="color:var(--danger)">${total.toLocaleString('bn-BD', {minimumFractionDigits: 2})}</b>
+                </div>
+                <div class="res-item res-net">
+                    <span>প্রদেয় নিট টাকা</span>
+                    <b>${net.toLocaleString('bn-BD', {minimumFractionDigits: 2})}</b>
+                </div>
+            `;
+        }
+    }
+
+    saveAndRender();
+</script>
+
+</body>
+</html>

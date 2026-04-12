@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>আমার টুলস ম্যানেজমেন্ট - হোম</title>
+    <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Hind Siliguri', sans-serif;
+            background-color: #f4f7f6;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+        .container {
+            width: 90%;
+            max-width: 1000px;
+            text-align: center;
+            background: white;
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+        }
+        h1 { color: #2c3e50; margin-bottom: 30px; }
+        .grid-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+        }
+        .card {
+            background: #ffffff;
+            border: 2px solid #e0e0e0;
+            padding: 25px;
+            border-radius: 12px;
+            text-decoration: none;
+            color: #333;
+            font-weight: 600;
+            font-size: 18px;
+            transition: all 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        .card:hover {
+            border-color: #3498db;
+            color: #3498db;
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(52, 152, 219, 0.2);
+        }
+        .icon {
+            font-size: 40px;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>আমার সার্ভিস পোর্টাল</h1>
+    <div class="grid-container">
+        <a href="PPP MANAGEMENT.html" class="card">
+            <div class="icon">📁</div>
+            PPO ম্যানেজমেন্ট সিস্টেম
+        </a>
+        <a href="Register.html" class="card">
+            <div class="icon">📝</div>
+            বিল রেজিস্টার
+        </a>
+        <a href="VAT IT Calculator.html" class="card">
+            <div class="icon">📊</div>
+            VAT & IT ক্যালকুলেটর
+        </a>
+        <a href="gratuity.html" class="card">
+            <div class="icon">💰</div>
+            আনুতোষিক ভাতা
+        </a>
+        <a href="envelop.html" class="card">
+            <div class="icon">✉️</div>
+            খাম প্রিন্টিং সফটওয়্যার
+        </a>
+    </div>
+</div>
+
+</body>
+</html>

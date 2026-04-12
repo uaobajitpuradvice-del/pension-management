@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <title>আনুতোষিক ভাতা ম্যানেজমেন্ট</title>
+    <style>
+        body { font-family: 'SolaimanLipi', Arial, sans-serif; background-color: #f0f2f5; margin: 0; padding: 20px; font-size: 14px; }
+        .entry-form-container { max-width: 650px; margin: 0 auto; background: white; padding: 25px; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+        .entry-form-container h2 { text-align: center; color: #333; margin-bottom: 20px; border-bottom: 2px solid #007bff; padding-bottom: 10px;}
+        .form-group { margin-bottom: 12px; display: flex; align-items: center; }
+        .form-group label { width: 40%; font-weight: bold; }
+        .form-group input, .form-group textarea { width: 60%; padding: 8px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; font-family: inherit; }
+        
+        .ppo-input-container { display: flex; width: 60%; align-items: center; border: 1px solid #ccc; border-radius: 4px; padding-left: 8px; background: #f9f9f9; }
+        .ppo-fixed { font-size: 12px; color: #555; white-space: nowrap; }
+        .ppo-input-container input { border: none; width: 100%; padding: 8px; background: transparent; outline: none; }
+
+        .checkbox-group { margin-left: 40%; margin-bottom: 15px; font-size: 13px; display: flex; align-items: center; }
+        .checkbox-group input { width: auto; margin-right: 10px; cursor: pointer; }
+        .submit-btn { width: 100%; background: #007bff; color: white; padding: 12px; border: none; border-radius: 4px; cursor: pointer; font-size: 15px; font-weight: bold; margin-top: 15px; }
+
+        #printableReport { display: none; width: 210mm; min-height: 297mm; padding: 15mm; margin: 0 auto; background: white; box-sizing: border-box; color: #000; }
+        .report-title { text-align: center; text-decoration: underline; font-size: 22px; font-weight: bold; margin-bottom: 20px; }
+        
+        table { width: 100%; border-collapse: collapse; margin-bottom: 15px; table-layout: fixed; }
+        td { border: 1px solid #000; padding: 8px 10px; font-size: 16px; line-height: 1.4; overflow: hidden; word-wrap: break-word; }
+        
+        /* কলামের মাপ পরিবর্তন: ১ম কলাম ছোট, ২য় কলাম বড় */
+        .label-col { width: 30%; font-weight: bold; }
+        .data-col { width: 70%; }
+        
+        /* শুধুমাত্র প্রথম সারি বোল্ড হবে */
+        tr:first-child td { font-weight: bold; }
+        .bold-row { font-weight: bold !important; }
+
+        .summary-line { margin-top: 15px; font-size: 17px; font-weight: bold; padding: 5px 0; line-height: 1.6; }
+        /* সংখ্যা ও কথায় আন্ডারলাইন */
+        .underline-text { text-decoration: underline; }
+
+        .signature-section { margin-top: 25px; }
+        .pensioner-sig { text-align: right; margin-bottom: 25px; }
+        .specimen-title { font-weight: bold; margin-bottom: 8px; text-decoration: underline; font-size: 16px; }
+        .sig-line { margin-bottom: 12px; font-size: 16px; }
+
+        .office-use-box { margin-top: 20px; border-top: 1px dashed #000; padding-top: 15px; }
+        .office-title { text-align: center; font-size: 18px; font-weight: bold; margin-bottom: 15px; display: block; text-decoration: underline; }
+        .office-payment-line { font-size: 16px; font-weight: bold; line-height: 2.2; margin-bottom: 60px; display: block; width: 100%; }
+
+        .office-auth-area { 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: flex-end; 
+            text-align: center; 
+            font-weight: bold; 
+            margin-top: 70px; 
+            width: 100%; 
+        }
+        .auth-box { width: 30%; border-top: 1px solid #000; padding-top: 8px; font-size: 14px; }
+
+        .print-controls { display: none; text-align: center; margin-top: 20px; padding-bottom: 50px; }
+        .back-btn { background: #6c757d; color: white; padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer; margin-right: 10px; }
+        .print-btn { background: #28a745; color: white; padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer; }
+
+        @media print {
+            body { background: white; padding: 0; margin: 0; }
+            .entry-form-container, .print-controls { display: none !important; }
+            #printableReport { display: block !important; margin: 0; border: none; width: 100%; height: auto; padding: 10mm 15mm; }
+            @page { size: A4; margin: 5mm; }
+        }
+    </style>
+</head>
+<body>
+
+<div id="entryForm" class="entry-form-container">
+    <h2>ভাতা ডাটা এন্ট্রি</h2>
+    <div class="form-group"><label>১. গ্রহণকারীর নাম:</label><input type="text" id="in_name"></div>
+    <div class="form-group"><label>২. এনআইডি নং:</label><input type="text" id="in_nid"></div>
+    <div class="form-group"><label>৩. জন্ম তারিখ:</label><input type="text" id="in_dob" placeholder="যেমন: ০১/০১/১৯৬০"></div>
+    <div class="form-group"><label>৪. স্থায়ী ঠিকানা:</label><textarea id="in_p_addr" rows="2" oninput="copyAddress()"></textarea></div>
+    <div class="checkbox-group"><input type="checkbox" id="same_addr" onclick="copyAddress()"> স্থায়ী ও বর্তমান ঠিকানা একই</div>
+    <div class="form-group"><label>৫. বর্তমান ঠিকানা:</label><textarea id="in_c_addr" rows="2"></textarea></div>
+    <div class="form-group"><label>৬. হিসাব খাত:</label><input type="text" id="in_acc" value="আনুতোষিক ভাতা"></div>
+    <div class="form-group"><label>৭. মঞ্জুরীর স্মারক নং:</label><input type="text" id="in_memo"></div>
+    <div class="form-group"><label>৮. আনুতোষিকের পরিমাণ:</label><input type="number" step="0.01" id="in_amt"></div>
+    <div class="form-group"><label>৯. অতিরিক্ত কর্তন:</label><input type="number" step="0.01" id="in_deduct" value="0"></div>
+    <div class="form-group"><label>১০. রেভিনিউ স্ট্যাম্প:</label><input type="number" step="0.01" id="in_rev" value="10"></div>
+    
+    <div class="form-group">
+        <label>১২. পিপিও ক্রমিক নং:</label>
+        <div class="ppo-input-container">
+            <span class="ppo-fixed">০৭.০৩.৪৮০৬.১০৪.২২.০০৩.২৬-</span>
+            <input type="text" id="in_ppo_serial" placeholder="ক্রমিক নং">
+        </div>
+    </div>
+    <div class="form-group">
+        <label>পিপিও তারিখ:</label>
+        <input type="date" id="in_ppo_date">
+    </div>
+
+    <button class="submit-btn" onclick="generateReport()">রিপোর্ট তৈরি করুন</button>
+</div>
+
+<div id="printableReport">
+    <div class="report-title">আনুতোষিক ভাতা ফরম</div>
+    <table>
+        <tr><td class="label-col">১. অবসর ভাতা গ্রহণকারীর নাম</td><td id="out_name" class="data-col"></td></tr>
+        <tr><td class="label-col">২. এনআইডি নং</td><td id="out_nid" class="data-col"></td></tr>
+        <tr><td class="label-col">৩. জন্ম তারিখ</td><td id="out_dob" class="data-col"></td></tr>
+        <tr><td class="label-col">৪. স্থায়ী ঠিকানা</td><td id="out_p_addr" class="data-col"></td></tr>
+        <tr><td class="label-col">৫. বর্তমান ঠিকানা</td><td id="out_c_addr" class="data-col"></td></tr>
+        <tr><td class="label-col">৬. হিসাব খাত</td><td class="data-col">আনুতোষিক ভাতা</td></tr>
+        <tr><td class="label-col">৭. মঞ্জুরীর বিভাগীয় স্মারক নং</td><td id="out_memo" class="data-col"></td></tr>
+        <tr><td class="label-col">৮. আনুতোষিকের পরিমাণ</td><td id="out_amt" class="data-col"></td></tr>
+        <tr><td class="label-col">৯. অতিরিক্ত গৃহীত কর্তন</td><td id="out_deduct" class="data-col"></td></tr>
+        <tr><td class="label-col">১০. রেভিনিউ স্ট্যাম্প কর্তন</td><td id="out_rev" class="data-col"></td></tr>
+        <tr class="bold-row"><td class="label-col">১১. নীট আনুতোষিক</td><td id="out_net" class="data-col"></td></tr>
+        <tr><td class="label-col">১২. পিপিও নং ও তারিখ</td><td id="out_ppo" class="data-col"></td></tr>
+    </table>
+
+    <div class="summary-line">
+        প্রদেয় টাকা : <span id="summary_net_num" class="underline-text"></span>/- (কথায়): <span id="summary_net_word" class="underline-text"></span>
+    </div>
+
+    <div class="signature-section">
+        <div class="pensioner-sig">
+            <span style="border-top: 2px solid #000; padding-top: 5px; font-weight: bold;">পেনশনারের স্বাক্ষর</span>
+        </div>
+        <div class="specimen-sig-area">
+            <div class="specimen-title">পেনশনারের নমুনা স্বাক্ষর :</div>
+            <div class="sig-line">১. ......................................................................</div>
+            <div class="sig-line">২. ......................................................................</div>
+            <div class="sig-line">৩. ......................................................................</div>
+        </div>
+    </div>
+
+    <div class="office-use-box">
+        <span class="office-title">হিসাবরক্ষণ অফিসে ব্যবহারের জন্য</span>
+        <div class="office-payment-line">
+            প্রদেয় টাকা : .................................................... (কথায়) ....................................................................<br>.......................................................................... পরিশোধ করুন। </br>
+        </div>
+        <div class="office-auth-area">
+            <div class="auth-box">(অডিটর)</div>
+            <div class="auth-box">(সুপার)</div>
+            <div class="auth-box">(উপজেলা হিসাবরক্ষণ কর্মকর্তা)</div>
+        </div>
+    </div>
+</div>
+
+<div id="controls" class="print-controls">
+    <button class="back-btn" onclick="goBack()">এডিট করুন</button>
+    <button class="print-btn" onclick="window.print()">প্রিন্ট করুন</button>
+</div>
+
+<script>
+    const nums = [
+        "", "এক", "দুই", "তিন", "চার", "পাঁচ", "ছয়", "সাত", "আট", "নয়", "দশ",
+        "এগারো", "বারো", "তেরো", "চৌদ্দ", "পনেরো", "ষোলো", "সতেরো", "আঠারো", "উনিশ", "বিশ",
+        "একুশ", "বাইশ", "তেইশ", "চব্বিশ", "পঁচিশ", "ছাব্বিশ", "সাতাশ", "আটাশ", "ঊনত্রিশ", "ত্রিশ",
+        "একত্রিশ", "বত্রিশ", "তেত্রিশ", "চৌত্রিশ", "পঁয়ত্রিশ", "ছত্রিশ", "সাঁইত্রিশ", "আটত্রিশ", "ঊনচল্লিশ", "চল্লিশ",
+        "একচল্লিশ", "বিয়াল্লিশ", "তেতাল্লিশ", "চৌয়াল্লিশ", "পঁয়তাল্লিশ", "ছেচল্লিশ", "সাতচল্লিশ", "আচল্লিশ", "ঊনপঞ্চাশ", "পঞ্চাশ",
+        "একান্ন", "বাহান্ন", "তিপ্পান্ন", "চুয়ান্ন", "পঞ্চান্ন", "ছাপ্পান্ন", "সাতান্ন", "আটান্ন", "ঊনষাট", "ষাট",
+        "একষট্টি", "বাষট্টি", "তেষট্টি", "চৌষট্টি", "পঁয়ষট্টি", "ছেষট্টি", "সাতষট্টি", "আটষট্টি", "ঊনসত্তর", "সত্তর",
+        "একাত্তর", "বাহাত্তর", "তিয়াত্তর", "চুয়াত্তর", "পঁচাত্তর", "ছিয়াত্তর", "সাতাত্তর", "আটাত্তর", "ঊনআশি", "আশি",
+        "একাশি", "বিরাশি", "তিরাশি", "চুরাশি", "পঁচাশি", "ছিয়াশি", "সাতাশি", "আটাশি", "ঊননব্বই", "নব্বই",
+        "একানব্বই", "বিরানব্বই", "তিরানব্বই", "চুরানব্বই", "পঁচানব্বই", "ছিয়ানব্বই", "সাতানব্বই", "আটানব্বই", "নিরানব্বই", "একশত"
+    ];
+
+    function copyAddress() {
+        const pAddr = document.getElementById('in_p_addr');
+        const cAddr = document.getElementById('in_c_addr');
+        const checkBox = document.getElementById('same_addr');
+        if (checkBox.checked) {
+            cAddr.value = pAddr.value;
+            cAddr.readOnly = true;
+            cAddr.style.backgroundColor = "#f9f9f9";
+        } else {
+            cAddr.readOnly = false;
+            cAddr.style.backgroundColor = "#fff";
+        }
+    }
+
+    function toBanglaNumber(n) {
+        if (!n) return "০";
+        const bng = ["০", "১", "২", "৩", "৪", "৫", "৬", "৭", "৮", "৯"];
+        return n.toString().split('').map(d => bng[d] || d).join('');
+    }
+
+    function formatBanglaCurrency(n) {
+        let parts = n.toFixed(2).split(".");
+        let x = parts[0];
+        let lastThree = x.substring(x.length - 3);
+        let otherNumbers = x.substring(0, x.length - 3);
+        if (otherNumbers != '') lastThree = ',' + lastThree;
+        let res = otherNumbers.replace(/\B(?=(\d{2})+(?!\d))/g, ",") + lastThree;
+        let formatted = toBanglaNumber(res);
+        if (parseInt(parts[1]) > 0) {
+            formatted += "." + toBanglaNumber(parts[1]);
+        }
+        return formatted;
+    }
+
+    function convertToWords(n) {
+        if (n == 0) return "";
+        let result = "";
+        if (n >= 10000000) {
+            result += convertToWords(Math.floor(n / 10000000)) + " কোটি ";
+            n %= 10000000;
+        }
+        if (n >= 100000) {
+            result += nums[Math.floor(n / 100000)] + " লক্ষ ";
+            n %= 100000;
+        }
+        if (n >= 1000) {
+            result += nums[Math.floor(n / 1000)] + " হাজার ";
+            n %= 1000;
+        }
+        if (n >= 100) {
+            result += nums[Math.floor(n / 100)] + " শত ";
+            n %= 100;
+        }
+        if (n > 0) {
+            result += nums[Math.floor(n)];
+        }
+        return result.trim();
+    }
+
+    function finalFormatWords(val) {
+        if (val === 0) return "(শূন্য টাকা মাত্র)";
+        let parts = val.toFixed(2).split(".");
+        let taka = parseInt(parts[0]);
+        let poisa = parseInt(parts[1]);
+        let result = "";
+        if (taka > 0) result += convertToWords(taka) + " টাকা";
+        if (poisa > 0) result += (taka > 0 ? " " : "") + nums[poisa] + " পয়সা";
+        return "(" + result.trim() + " মাত্র)";
+    }
+
+    function generateReport() {
+        const amt = parseFloat(document.getElementById('in_amt').value) || 0;
+        const deduct = parseFloat(document.getElementById('in_deduct').value) || 0;
+        const rev = parseFloat(document.getElementById('in_rev').value) || 0;
+        const net = amt - (deduct + rev);
+
+        document.getElementById('out_name').innerText = document.getElementById('in_name').value;
+        document.getElementById('out_nid').innerText = toBanglaNumber(document.getElementById('in_nid').value);
+        document.getElementById('out_dob').innerText = toBanglaNumber(document.getElementById('in_dob').value);
+        document.getElementById('out_p_addr').innerText = document.getElementById('in_p_addr').value;
+        document.getElementById('out_c_addr').innerText = document.getElementById('in_c_addr').value;
+        document.getElementById('out_memo').innerText = toBanglaNumber(document.getElementById('in_memo').value);
+
+        const ppoSerial = document.getElementById('in_ppo_serial').value;
+        const ppoDateRaw = document.getElementById('in_ppo_date').value;
+        let ppoFormatted = "০৭.০৩.৪৮০৬.১০৪.২২.০০৩.২৬-" + toBanglaNumber(ppoSerial);
+        if(ppoDateRaw) {
+            const dateParts = ppoDateRaw.split("-");
+            const banglaDate = toBanglaNumber(dateParts[2]) + "/" + toBanglaNumber(dateParts[1]) + "/" + toBanglaNumber(dateParts[0]);
+            ppoFormatted += ", তারিখ: " + banglaDate + " ইং।";
+        }
+        document.getElementById('out_ppo').innerText = ppoFormatted;
+
+        document.getElementById('out_amt').innerText = formatBanglaCurrency(amt) + "/- " + finalFormatWords(amt);
+        document.getElementById('out_deduct').innerText = formatBanglaCurrency(deduct) + "/- " + finalFormatWords(deduct);
+        document.getElementById('out_rev').innerText = formatBanglaCurrency(rev) + "/-";
+        document.getElementById('out_net').innerText = formatBanglaCurrency(net) + "/- " + finalFormatWords(net);
+
+        document.getElementById('summary_net_num').innerText = formatBanglaCurrency(net);
+        document.getElementById('summary_net_word').innerText = finalFormatWords(net);
+
+        document.getElementById('entryForm').style.display = 'none';
+        document.getElementById('printableReport').style.display = 'block';
+        document.getElementById('controls').style.display = 'block';
+    }
+
+    function goBack() {
+        document.getElementById('entryForm').style.display = 'block';
+        document.getElementById('printableReport').style.display = 'none';
+        document.getElementById('controls').style.display = 'none';
+    }
+</script>
+</body>
+</html>

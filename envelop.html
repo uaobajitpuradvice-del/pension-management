@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>খাম প্রিন্টিং সফটওয়্যার</title>
+    <style>
+        body {
+            font-family: 'SutonnyMJ', 'Kalpurush', Arial, sans-serif;
+            background-color: #f0f0f0;
+            margin: 0;
+            padding: 20px;
+        }
+
+        /* খামের সাইজ এবং ডিজাইন */
+        .envelope {
+            width: 9.5in;
+            height: 4.12in;
+            background-color: white;
+            margin: 0 auto;
+            border: 1px solid #ccc;
+            position: relative;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            padding: 0.5in;
+            box-sizing: border-box;
+        }
+
+        /* প্রেরক (বামে) */
+        .sender {
+            position: absolute;
+            top: 0.5in;
+            left: 0.5in;
+            width: 3.5in;
+            font-size: 16px;
+            line-height: 1.4;
+        }
+
+        .sender h4 {
+            margin: 0 0 5px 0;
+            text-decoration: underline;
+        }
+
+        /* প্রাপক (ডানে) */
+        .receiver {
+            position: absolute;
+            top: 2in;
+            left: 5in;
+            width: 4in;
+            font-size: 18px;
+            line-height: 1.5;
+        }
+
+        .receiver h4 {
+            margin: 0 0 5px 0;
+            text-decoration: underline;
+        }
+
+        /* প্রিন্ট করার সময় সেটিংস */
+        @media print {
+            body {
+                background-color: white;
+                padding: 0;
+            }
+            .envelope {
+                border: none;
+                box-shadow: none;
+                margin: 0;
+            }
+            .no-print {
+                display: none;
+            }
+        }
+
+        .no-print {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        button {
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="no-print">
+        <p>নিচের তথ্যগুলো পরিবর্তন করে প্রিন্ট বাটনে ক্লিক করুন।</p>
+        <button onclick="window.print()">প্রিন্ট করুন</button>
+    </div>
+
+    <div class="envelope">
+        <div class="sender" contenteditable="true">
+            <h4>প্রেরক:</h4>
+            নাম: আপনার নাম/পদবী<br>
+            ঠিকানা: আপনার অফিসের ঠিকানা<br>
+            মোবাইল: ০১xxxxxxxxx
+        </div>
+
+        <div class="receiver" contenteditable="true">
+            <h4>প্রাপক:</h4>
+            নাম: প্রাপকের নাম/পদবী<br>
+            ঠিকানা: বিস্তারিত ঠিকানা লিখুন<br>
+            জেলা: জেলা ও পোস্ট কোড
+        </div>
+    </div>
+
+</body>
+</html>
