@@ -9,7 +9,7 @@
         :root {
             --primary: #2563eb;
             --bg-gradient: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
-            --glass-white: rgba(255, 255, 255, 0.7); /* ট্রান্সপারেন্ট সাদা */
+            --glass-white: rgba(255, 255, 255, 0.7);
             --border-color: rgba(37, 99, 235, 0.2);
         }
 
@@ -25,8 +25,8 @@
         .container {
             max-width: 1400px;
             margin: auto;
-            background: var(--glass-white); /* ট্রান্সপারেন্ট ব্যাকগ্রাউন্ড */
-            backdrop-filter: blur(10px); /* ঝাপসা ভাব */
+            background: var(--glass-white);
+            backdrop-filter: blur(10px);
             padding: 30px;
             border-radius: 20px;
             border: 1px solid var(--border-color);
@@ -44,7 +44,6 @@
 
         h2 { margin: 0; color: var(--primary); font-size: 28px; }
 
-        /* বড় সার্চ বক্স */
         .toolbar {
             display: grid;
             grid-template-columns: 2fr 1fr 0.5fr;
@@ -52,9 +51,9 @@
             margin-bottom: 25px;
         }
 
-        .search-container input {
+        .search-container input, .filter-container input {
             width: 100%;
-            padding: 15px;
+            padding: 14px;
             border: 2px solid var(--primary);
             border-radius: 12px;
             font-size: 16px;
@@ -62,20 +61,6 @@
             outline: none;
             box-sizing: border-box;
             text-align: center;
-            transition: 0.3s;
-        }
-
-        .search-container input:focus {
-            box-shadow: 0 0 12px rgba(37, 99, 235, 0.2);
-        }
-
-        .filter-container input {
-            width: 100%;
-            padding: 14px;
-            border: 2px solid #cbd5e1;
-            border-radius: 12px;
-            text-align: center;
-            background: rgba(255, 255, 255, 0.9);
         }
 
         .btn {
@@ -90,32 +75,30 @@
         .btn-add { background: var(--primary); color: white; }
         .btn-add:hover { background: #1d4ed8; transform: translateY(-2px); }
 
-        /* টেবিল ডিজাইন */
         .table-card {
             background: rgba(255, 255, 255, 0.9);
             border-radius: 15px;
-            overflow: hidden;
+            overflow-x: auto;
             border: 1px solid var(--primary);
         }
 
-        table { width: 100%; border-collapse: collapse; }
+        table { width: 100%; border-collapse: collapse; min-width: 1000px; }
 
         th {
             background: var(--primary);
             color: white;
             padding: 18px;
-            border: 1px solid rgba(255,255,255,0.2);
             text-align: center;
         }
 
         td {
             padding: 14px;
-            border: 1px solid #e2e8f0;
+            border-bottom: 1px solid #e2e8f0;
             text-align: center;
             font-size: 15px;
         }
 
-        tr:nth-child(even) { background: rgba(241, 245, 249, 0.5); }
+        tr:hover { background: rgba(37, 99, 235, 0.05); }
 
         .delivery-highlight {
             background: #dcfce7;
@@ -125,7 +108,6 @@
             font-weight: bold;
         }
 
-        /* পপ-আপ ফর্ম */
         .modal-overlay {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
@@ -142,17 +124,21 @@
             width: 600px;
             padding: 30px;
             border-radius: 20px;
-            box-shadow: 0 20px 50px rgba(0,0,0,0.2);
+            max-height: 90vh;
+            overflow-y: auto;
         }
 
         .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
         .full { grid-column: span 2; }
         .form-group label { display: block; margin-bottom: 5px; font-weight: 600; }
-        .form-group input { width: 94%; padding: 10px; border: 1px solid #ddd; border-radius: 8px; }
+        .form-group input { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; }
 
-        .edit-btn { color: #f59e0b; background: none; border: none; cursor: pointer; font-weight: bold; margin-right: 10px;}
-        .delete-btn { color: #ef4444; background: none; border: none; cursor: pointer; font-weight: bold; }
-
+        #loadingStatus {
+            text-align: center;
+            padding: 20px;
+            font-weight: bold;
+            color: var(--primary);
+        }
     </style>
 </head>
 <body>
@@ -173,6 +159,8 @@
         <button class="btn" style="background: #94a3b8; color: white;" onclick="resetAll()">রিসেট</button>
     </div>
 
+    <div id="loadingStatus" style="display:none;">গুগল শিট থেকে ডাটা লোড হচ্ছে...</div>
+
     <div class="table-card">
         <table>
             <thead>
@@ -186,7 +174,6 @@
                     <th>ডেলিভারি</th>
                     <th>প্রাপক</th>
                     <th>মন্তব্য</th>
-                    <th>অ্যাকশন</th>
                 </tr>
             </thead>
             <tbody id="tableBody"></tbody>
@@ -198,7 +185,6 @@
     <div class="modal">
         <h3 id="modalTitle" style="color:var(--primary)">নতুন বিল এন্ট্রি</h3>
         <div class="form-grid">
-            <input type="hidden" id="editIndex">
             <div class="form-group"><label>বিল নম্বর</label><input type="text" id="billNo"></div>
             <div class="form-group"><label>অফিস/ডিডিও</label><input type="text" id="office"></div>
             <div class="form-group"><label>প্রাপ্তির তারিখ</label><input type="date" id="receiveDate"></div>
@@ -210,21 +196,34 @@
         </div>
         <div style="margin-top: 25px; text-align: right;">
             <button class="btn" style="background:#e2e8f0" onclick="toggleModal(false)">বাতিল</button>
-            <button class="btn btn-add" onclick="saveData()">সেভ করুন</button>
+            <button class="btn btn-add" id="saveBtn" onclick="saveData()">সেভ করুন</button>
         </div>
     </div>
 </div>
 
 <script>
-    let bills = JSON.parse(localStorage.getItem('bill_reg_trans')) || [];
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxqVO-0054ZgCCSZ3aHf2KZ4FEeabQvQukR0y1ERiRu2gvQDEgpIc58Wx27MW1yVU2d/exec";
+    let bills = [];
 
-    function toggleModal(show) {
-        document.getElementById('modalOverlay').style.display = show ? 'flex' : 'none';
-        if(!show) clearForm();
+    // পেজ লোড হলে ডাটা আনা
+    window.onload = loadData;
+
+    async function loadData() {
+        document.getElementById('loadingStatus').style.display = 'block';
+        try {
+            const response = await fetch(SCRIPT_URL);
+            bills = await response.json();
+            renderData();
+        } catch (error) {
+            console.error("Error loading data:", error);
+            alert("ডাটা লোড করতে সমস্যা হয়েছে।");
+        } finally {
+            document.getElementById('loadingStatus').style.display = 'none';
+        }
     }
 
-    function saveData() {
-        const id = document.getElementById('editIndex').value;
+    async function saveData() {
+        const saveBtn = document.getElementById('saveBtn');
         const data = {
             billNo: document.getElementById('billNo').value,
             office: document.getElementById('office').value,
@@ -236,14 +235,28 @@
             remarks: document.getElementById('remarks').value
         };
 
-        if(!data.billNo || !data.office) return alert("তথ্য পূরণ করুন!");
+        if(!data.billNo || !data.office) return alert("বিল নম্বর এবং অফিস নাম আবশ্যক!");
 
-        if(id === "") bills.push(data);
-        else bills[id] = data;
+        saveBtn.innerText = "সেভ হচ্ছে...";
+        saveBtn.disabled = true;
 
-        localStorage.setItem('bill_reg_trans', JSON.stringify(bills));
-        toggleModal(false);
-        renderData();
+        try {
+            await fetch(SCRIPT_URL, {
+                method: "POST",
+                mode: "no-cors", // CORS ইস্যু এড়াতে
+                cache: "no-cache",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(data)
+            });
+            
+            toggleModal(false);
+            // সরাসরি শিট থেকে আপডেট ডাটা আনতে ২ সেকেন্ড অপেক্ষা (Apps Script Sync Time)
+            setTimeout(loadData, 1500); 
+        } catch (error) {
+            alert("সেভ করতে সমস্যা হয়েছে।");
+            saveBtn.disabled = false;
+            saveBtn.innerText = "সেভ করুন";
+        }
     }
 
     function renderData() {
@@ -253,53 +266,43 @@
         tbody.innerHTML = "";
 
         bills.forEach((b, i) => {
-            const matchesQuery = b.billNo.toLowerCase().includes(query) || 
-                                 b.office.toLowerCase().includes(query) || 
-                                 b.tokenNo.toLowerCase().includes(query);
-            const matchesMonth = !month || b.receiveDate.startsWith(month);
+            // Apps Script থেকে আসা ডাটা প্রসেসিং (key names logic)
+            const bNo = b.billno || '';
+            const bOff = b.office || '';
+            const bTok = b.tokenno || '';
+            const bDate = b.receivedate || '';
+
+            const matchesQuery = bNo.toString().toLowerCase().includes(query) || 
+                                 bOff.toLowerCase().includes(query) || 
+                                 bTok.toString().toLowerCase().includes(query);
+            
+            const matchesMonth = !month || bDate.startsWith(month);
 
             if(matchesQuery && matchesMonth) {
-                tbody.innerHTML += `
-                    <tr>
-                        <td>${i + 1}</td>
-                        <td><b>${b.billNo}</b></td>
-                        <td>${b.office}</td>
-                        <td>${b.receiveDate}</td>
-                        <td>${b.tokenNo}</td>
-                        <td>${Number(b.amount).toLocaleString('bn-BD')}</td>
-                        <td><span class="delivery-highlight">${b.deliveryDate || 'প্রক্রিয়াধীন'}</span></td>
-                        <td>${b.receiverName}</td>
-                        <td>${b.remarks}</td>
-                        <td>
-                            <button class="edit-btn" onclick="editData(${i})">এডিট</button>
-                            <button class="delete-btn" onclick="deleteData(${i})">ডিলিট</button>
-                        </td>
-                    </tr>
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${i + 1}</td>
+                    <td><b>${bNo}</b></td>
+                    <td>${bOff}</td>
+                    <td>${bDate}</td>
+                    <td>${bTok}</td>
+                    <td>${Number(b.amount || 0).toLocaleString('bn-BD')}</td>
+                    <td><span class="delivery-highlight">${b.deliverydate || 'প্রক্রিয়াধীন'}</span></td>
+                    <td>${b.receivername || ''}</td>
+                    <td>${b.remarks || ''}</td>
                 `;
+                tbody.appendChild(tr);
             }
         });
     }
 
-    function editData(i) {
-        const b = bills[i];
-        document.getElementById('billNo').value = b.billNo;
-        document.getElementById('office').value = b.office;
-        document.getElementById('receiveDate').value = b.receiveDate;
-        document.getElementById('tokenNo').value = b.tokenNo;
-        document.getElementById('amount').value = b.amount;
-        document.getElementById('deliveryDate').value = b.deliveryDate;
-        document.getElementById('receiverName').value = b.receiverName;
-        document.getElementById('remarks').value = b.remarks;
-        document.getElementById('editIndex').value = i;
-        document.getElementById('modalTitle').innerText = "তথ্য সংশোধন";
-        toggleModal(true);
-    }
-
-    function deleteData(i) {
-        if(confirm("মুছে ফেলতে চান?")) {
-            bills.splice(i, 1);
-            localStorage.setItem('bill_reg_trans', JSON.stringify(bills));
-            renderData();
+    function toggleModal(show) {
+        document.getElementById('modalOverlay').style.display = show ? 'flex' : 'none';
+        if(!show) {
+            document.querySelectorAll('.modal input').forEach(input => input.value = "");
+            const saveBtn = document.getElementById('saveBtn');
+            saveBtn.innerText = "সেভ করুন";
+            saveBtn.disabled = false;
         }
     }
 
@@ -308,13 +311,6 @@
         document.getElementById('monthFilter').value = "";
         renderData();
     }
-
-    function clearForm() {
-        document.getElementById('editIndex').value = "";
-        document.querySelectorAll('.modal input').forEach(input => input.value = "");
-    }
-
-    renderData();
 </script>
 
 </body>
