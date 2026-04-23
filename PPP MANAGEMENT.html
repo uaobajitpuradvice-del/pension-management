@@ -49,7 +49,7 @@
             box-shadow: 0 2px 10px rgba(0,0,0,0.1);
         }
 
-        .nav-brand { font-size: 22px; font-weight: 700; }
+        .nav-brand { font-size: 22px; font-weight: 700; display: flex; align-items: center; gap: 10px; }
         .nav-controls { display: flex; align-items: center; gap: 15px; }
         
         .nav-stat-box { display: flex; gap: 10px; }
@@ -71,7 +71,6 @@
         }
         .office-name { font-size: 42px; color: var(--dark-blue); margin: 0; font-weight: 800; }
 
-        /* বড় এবং মাঝখানের সার্চ সেকশন */
         .search-container {
             display: flex;
             justify-content: center;
@@ -82,13 +81,13 @@
         .search-box-wrapper {
             position: relative;
             width: 100%;
-            max-width: 800px; /* সার্চবার আরও বড় করা হয়েছে */
+            max-width: 800px;
         }
 
         #searchInput {
             width: 100%;
             padding: 22px 35px 22px 65px;
-            font-size: 22px; /* ফন্ট সাইজ বাড়ানো হয়েছে */
+            font-size: 22px;
             border-radius: 60px;
             border: none;
             outline: none;
@@ -145,7 +144,9 @@
 </div>
 
 <nav>
-    <div class="nav-brand"><i class="fas fa-folder-open"></i> PPO ড্যাশবোর্ড</div>
+    <div class="nav-brand">
+        <i class="fas fa-book-open"></i> PPO ড্যাশবোর্ড
+    </div>
     
     <div class="nav-controls">
         <button class="page-btn btn-add" onclick="openForm()"><i class="fas fa-plus-circle"></i> নতুন এন্ট্রি</button>
@@ -261,7 +262,7 @@
             updateStatsOnly();
             showLoading(false);
             icon.classList.remove('spin');
-            handleSearch(); // ডেটা আসার পর যদি সার্চবক্সে কিছু থাকে তা আপডেট করবে
+            handleSearch();
         }).catch(() => { showLoading(false); icon.classList.remove('spin'); });
     }
 
@@ -356,6 +357,14 @@
         document.getElementById('oldId').value = ""; 
         document.getElementById('pId').readOnly = false;
         document.getElementById('formTitle').innerHTML = '<i class="fas fa-plus-circle"></i> নতুন ডাটা এন্ট্রি';
+        
+        let lastId = 0;
+        if (ppoData.length > 0) {
+            const ids = ppoData.map(item => parseInt(toEn(item.id)) || 0);
+            lastId = Math.max(...ids);
+        }
+        document.getElementById('pId').value = toBn(lastId + 1);
+        
         showSection('entry'); 
     }
 
