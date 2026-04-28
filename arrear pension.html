@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>বকেয়া পেনশন ভাতার বিল</title>
+    <style>
+        @page { size: A4; margin: 10mm; }
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f4f4f9;
+            margin: 0; padding: 20px;
+            display: flex; justify-content: center;
+        }
+        .a4-page {
+            background: white; width: 210mm; min-height: 297mm;
+            padding: 15mm; box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            box-sizing: border-box;
+        }
+        .header { text-align: center; line-height: 1.2; }
+        .header h2 { margin: 5px 0; font-size: 16pt; }
+        .header h3 { margin: 2px 0; font-size: 13pt; font-weight: normal; }
+        
+        .input-line {
+            border: none; border-bottom: 1px dotted #000;
+            font-family: inherit; font-size: 11pt;
+            padding: 2px 5px; background: transparent; outline: none;
+        }
+        
+        .form-section { margin-top: 20px; line-height: 2.8; }
+        .info-row { display: flex; justify-content: space-between; gap: 40px; }
+        .info-group { display: flex; flex: 1; align-items: baseline; }
+        .info-group input { flex: 1; margin-left: 5px; }
+
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { border: 1px solid black; padding: 8px; text-align: center; font-size: 11pt; }
+        .left-align { text-align: left; padding-left: 10px; }
+        .bold { font-weight: bold; }
+        
+        input.table-input {
+            width: 90%; border: none; text-align: center;
+            font-size: 11pt; outline: none; font-family: inherit;
+        }
+
+        .footer-amount-section {
+            margin-top: 80px;
+            font-size: 12pt;
+        }
+
+        .signature-area {
+            margin-top: 100px;
+            display: flex; justify-content: space-between; text-align: center;
+        }
+        .sig-box { width: 30%; }
+        .sig-line { border-top: 1px solid black; margin-top: 40px; padding-top: 5px; }
+
+        @media print {
+            body { background: none; padding: 0; }
+            .a4-page { box-shadow: none; margin: 0; width: 100%; }
+            .no-print { display: none; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="a4-page">
+    <div class="header">
+        <h2>গণপ্রজাতন্ত্রী বাংলাদেশ সরকার</h2>
+        <h3>উপজেলা হিসাবরক্ষণ কর্মকর্তার কার্যালয়, বাজিতপুর, কিশোরগঞ্জ।</h3>
+        <p>অফিস/মন্ত্রণালয় কোড নং : ১০৯০৩০৫১০১৭০৪</p>
+    </div>
+
+    <div class="form-section">
+        <div class="info-row">
+            <div class="info-group">পেনশনরের নাম : <input type="text" class="input-line"></div>
+            <div class="info-group">এনআইডি নম্বর : <input type="text" class="input-line"></div>
+        </div>
+        <div class="info-row">
+            <div class="info-group">পিপিও নম্বর : <input type="text" class="input-line"></div>
+            <div class="info-group">ইপিপিও নম্বর : <input type="text" class="input-line"></div>
+        </div>
+    </div>
+
+    <table>
+        <thead>
+            <tr>
+                <th style="width: 15%;">অর্থনৈতিক কোড</th>
+                <th style="width: 45%;">বিবরণ</th>
+                <th style="width: 20%;">মোট টাকা</th>
+                <th style="width: 20%;">স্বাক্ষর</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>৩৭১১১০৩</td>
+                <td class="left-align">মাসিক পেনশন</td>
+                <td><input type="text" class="table-input amount" id="pension"></td>
+                <td rowspan="11" style="vertical-align: bottom; padding-bottom: 10px;">স্বাক্ষর</td>
+            </tr>
+            <tr>
+                <td>৩৭১১১০৪</td>
+                <td class="left-align">চিকিৎসা ভাতা</td>
+                <td><input type="text" class="table-input amount" id="medical"></td>
+            </tr>
+            <tr>
+                <td>৩৭১১১১৪</td>
+                <td class="left-align">বিশেষ সুবিধা</td>
+                <td><input type="text" class="table-input amount" id="special"></td>
+            </tr>
+            <tr>
+                <td>৩৭১১১০৬</td>
+                <td class="left-align">উৎসব ভাতা</td>
+                <td><input type="text" class="table-input amount" id="festival"></td>
+            </tr>
+            <tr>
+                <td>৩১১১১০৮</td>
+                <td class="left-align">নববর্ষ ভাতা</td>
+                <td><input type="text" class="table-input amount" id="newyear"></td>
+            </tr>
+            <tr style="background: #f9f9f9;">
+                <td></td>
+                <td class="bold">মোট ভাতা</td>
+                <td id="totalAllowance" class="bold"></td>
+            </tr>
+            <tr>
+                <td>১১৬২১০১</td>
+                <td class="left-align">স্ট্যাম্প ডিউটি (কর্তন)</td>
+                <td>১০</td>
+            </tr>
+            <tr>
+                <td></td>
+                <td class="left-align">অন্যান্য কর্তন</td>
+                <td><input type="text" class="table-input amount" id="otherDeduction"></td>
+            </tr>
+            <tr style="background: #f9f9f9;">
+                <td></td>
+                <td class="bold">মোট কর্তন</td>
+                <td id="totalDeduction" class="bold"></td>
+            </tr>
+            <tr style="background: #eee;">
+                <td></td>
+                <td class="bold">নিট টাকা </td>
+                <td id="netAmount" class="bold"></td> 
+            </tr>
+            <tr>
+                <td colspan="3" class="left-align" style="height: 45px;">কথায় :- <span id="amountInWords" class="bold"></span></td> 
+            </tr>
+        </tbody>
+    </table>
+
+    <div class="footer-amount-section">
+        দেয় টাকা : <span style="border-bottom: 1.5px dotted #000; min-width: 173px; display: inline-block;"></span> 
+        &nbsp;&nbsp;&nbsp;&nbsp; কথায় :- <span style="border-bottom: 1.5px dotted #000; min-width: 373px; display: inline-block;"></span>
+    </div>
+
+    <div class="signature-area">
+        <div class="sig-box"><div class="sig-line">অডিটর</div></div>
+        <div class="sig-box"><div class="sig-line">সুপার</div></div>
+        <div class="sig-box"><div class="sig-line">উপজেলা হিসাবরক্ষণ অফিসার</div></div>
+    </div>
+    
+    <div class="no-print" style="margin-top: 30px; text-align: center;">
+        <button onclick="window.print()" style="padding: 10px 20px; font-size: 16px; cursor: pointer; background: #28a745; color: white; border: none; border-radius: 5px;">প্রিন্ট করুন</button>
+    </div>
+</div>
+
+<script>
+    const bnDigits = ['০', '১', '২', '৩', '৪', '৫', '৬', '৭', '৮', '৯'];
+    const engDigits = {'০':0, '১':1, '২':2, '৩':3, '৪':4, '৫':5, '৬':6, '৭':7, '৮':8, '৯':9};
+    
+    const words = ["", "এক", "দুই", "তিন", "চার", "পাঁচ", "ছয়", "সাত", "আট", "নয়", "দশ", 
+    "এগারো", "বারো", "তেরো", "চৌদ্দ", "পনেরো", "ষোলো", "সতেরো", "আঠারো", "উনিশ", "বিশ", 
+    "একুশ", "বাইশ", "তেইশ", "চব্বিশ", "পঁচিশ", "ছাব্বিশ", "সাতাশ", "আটাশ", "উনত্রিশ", "ত্রিশ", 
+    "একত্রিশ", "বত্রিশ", "তেত্রিশ", "চৌত্রিশ", "পঁয়ত্রিশ", "ছত্রিশ", "সাঁইত্রিশ", "আটত্রিশ", "ঊনচল্লিশ", "চল্লিশ", 
+    "একচল্লিশ", "বিয়াল্লিশ", "তেতাল্লিশ", "চুয়াল্লিশ", "পঁয়তাল্লিশ", "ছেচল্লিশ", "সাতচল্লিশ", "আটচল্লিশ", "ঊনপঞ্চাশ", "পঞ্চাশ", 
+    "একান্ন", "বায়ান্ন", "তিপ্পান্ন", "চুয়ান্ন", "পঞ্চান্ন", "ছাপ্পান্ন", "সাতান্ন", "আটান্ন", "ঊনষাট", "ষাট", 
+    "একষট্টি", "বাষট্টি", "তেষট্টি", "চৌষট্টি", "পঁয়ষট্টি", "ছেষট্টি", "সাতষট্টি", "আটষট্টি", "ঊনসত্তর", "সত্তর", 
+    "একাত্তর", "বাহাত্তর", "তেহাত্তর", "চুয়াত্তর", "পঁচাত্তর", "ছিয়াত্তর", "সাতাত্তর", "আটাত্তর", "ঊনআশি", "আশি", 
+    "একাশি", "বিরাশি", "তিরাশি", "চুরাশি", "পঁচাশি", "ছিয়াশি", "সাতাসি", "অষ্টাসি", "ঊননব্বই", "নব্বই", 
+    "একানব্বই", "বিরানব্বই", "তিরানব্বই", "চুরানব্বই", "পঁচানব্বই", "ছিয়ানব্বই", "সাতানব্বই", "আটানব্বই", "নিরানব্বই"];
+
+    function toBn(n) {
+        if(!n && n !== 0) return "";
+        return n.toString().split('').map(d => bnDigits[d] || d).join('');
+    }
+
+    function toEn(n) {
+        return n.toString().split('').map(d => engDigits[d] !== undefined ? engDigits[d] : d).join('');
+    }
+
+    function generateWords(n) {
+        if (n == 0) return "";
+        let res = "";
+        if (n >= 10000000) { res += generateWords(Math.floor(n / 10000000)) + " কোটি "; n %= 10000000; }
+        if (n >= 100000) { res += words[Math.floor(n / 100000)] + " লক্ষ "; n %= 100000; }
+        if (n >= 1000) { res += words[Math.floor(n / 1000)] + " হাজার "; n %= 1000; }
+        if (n >= 100) { res += words[Math.floor(n / 100)] + " শত "; n %= 100; }
+        if (n > 0) res += words[n];
+        return res.trim();
+    }
+
+    function convertToBengaliAmount(num) {
+        if (num <= 0) return "শূন্য টাকা মাত্র";
+        let amount = Math.floor(num);
+        let paisa = Math.round((num - amount) * 100);
+        
+        let result = generateWords(amount) + " টাকা";
+        if (paisa > 0) {
+            result += " " + words[paisa] + " পয়সা";
+        } else {
+            result += " মাত্র";
+        }
+        return result;
+    }
+
+    document.querySelectorAll('.amount').forEach(input => {
+        input.addEventListener('input', function() {
+            let start = this.selectionStart;
+            let val = toEn(this.value).replace(/[^0-9.]/g, '');
+            let parts = val.split('.');
+            if (parts.length > 2) val = parts[0] + '.' + parts.slice(1).join('');
+            this.value = toBn(val);
+            this.setSelectionRange(start, start);
+            calculate();
+        });
+    });
+
+    function calculate() {
+        const getV = (id) => parseFloat(toEn(document.getElementById(id).value)) || 0;
+        const allowance = getV('pension') + getV('medical') + getV('special') + getV('festival') + getV('newyear');
+        const otherDeduct = getV('otherDeduction');
+        const stamp = 10;
+        const totalDeduct = stamp + otherDeduct;
+        const net = allowance - totalDeduct;
+
+        if(allowance > 0) {
+            const formatNum = (num) => toBn(Number(num.toFixed(2)).toString());
+            document.getElementById('totalAllowance').innerText = formatNum(allowance);
+            document.getElementById('totalDeduction').innerText = formatNum(totalDeduct);
+            let finalNet = net > 0 ? net : 0;
+            document.getElementById('netAmount').innerText = formatNum(finalNet);
+            document.getElementById('amountInWords').innerText = convertToBengaliAmount(finalNet);
+        } else {
+            document.getElementById('totalAllowance').innerText = "";
+            document.getElementById('totalDeduction').innerText = "";
+            document.getElementById('netAmount').innerText = "";
+            document.getElementById('amountInWords').innerText = "";
+        }
+    }
+</script>
+
+</body>
+</html>
